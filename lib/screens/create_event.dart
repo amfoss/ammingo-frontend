@@ -11,12 +11,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _timeLimitController = TextEditingController();
   final TextEditingController _participantsController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   @override
   void dispose() {
     _eventNameController.dispose();
     _descriptionController.dispose();
     _timeLimitController.dispose();
     _participantsController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -67,7 +69,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: height * 0.05),
+                SizedBox(height: height * 0.03),
                 Text(
                   "Event Description",
                   style: TextStyle(
@@ -98,7 +100,39 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   ),
                 ),
 
-                SizedBox(height: height * 0.05),
+                SizedBox(height: height * 0.03),
+
+                Text(
+                  "Location",
+                  style: TextStyle(
+                    color: colorScheme.primary,
+                    fontSize: width * 0.04,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: height * 0.01),
+                TextField(
+                  style: TextStyle(color: colorScheme.onSurface),
+                  cursorColor: colorScheme.primary,
+                  controller: _locationController,
+                  decoration: InputDecoration(
+                    hintText: "Enter the location of the event",
+                    hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: colorScheme.outline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: height * 0.03),
 
                 Text(
                   "Time Limit",
@@ -140,7 +174,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: height * 0.05),
+                SizedBox(height: height * 0.03),
                 Text(
                   "Maximum Participants",
                   style: TextStyle(
