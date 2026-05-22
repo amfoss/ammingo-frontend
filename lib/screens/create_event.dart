@@ -200,9 +200,16 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         MaterialPageRoute(
                           builder: (context) => EventDetails(
                             eventName: _eventNameController.text,
-                            hostName: "amFOSS",
-                            hostPfp: "https://i.pravatar.cc/150?img=6",
-                            joinOrStart: "START",
+                            hostName: "amFOSS", //Host name fetch from backend
+                            hostPfp: 'https://i.pravatar.cc/150?img=6',
+                            joinOrStart: 'PLAY',
+                            duration:
+                                int.tryParse(_timeLimitController.text) ?? 0,
+                            description: _descriptionController.text,
+                            // calendar_date: '',
+                            // day: '',
+                            // mainLocation: '',
+                            // subLocation: '',
                           ),
                         ),
                       );

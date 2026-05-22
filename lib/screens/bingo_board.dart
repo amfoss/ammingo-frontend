@@ -7,7 +7,18 @@ import 'bingo_tile.dart';
 import 'friend_verification.dart';
 
 class BingoBoard extends StatefulWidget {
-  const BingoBoard({super.key});
+  final String eventName;
+  final String hostName;
+  final int timelimit;
+  final String description;
+
+  const BingoBoard({
+    super.key,
+    required this.eventName,
+    required this.hostName,
+    required this.timelimit,
+    required this.description,
+  });
 
   @override
   State<BingoBoard> createState() => _BingoBoardState();
@@ -16,18 +27,19 @@ class BingoBoard extends StatefulWidget {
 class _BingoBoardState extends State<BingoBoard> {
   List<BingoCell> board = [];
 
-  int checkedTiles = 1; // free tile count 0+1
-  int timeLeft = 120;
-  int score = 12450;
+  int checkedTiles = 1;
+  late int timeLeft;
 
-  String eventName = 'HacktoberFest 2026';
-  String hostName = 'amFOSS';
+  int score = 12450;
 
   Timer? timer;
 
   @override
   void initState() {
     super.initState();
+
+    timeLeft = widget.timelimit;
+
     board = generateBoard();
 
     // TIMER LOGIC
@@ -143,10 +155,16 @@ class _BingoBoardState extends State<BingoBoard> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => EventDetails(
-                          eventName: eventName,
-                          hostName: hostName,
+                          eventName: widget.eventName,
+                          hostName: widget.hostName,
                           hostPfp: 'https://i.pravatar.cc/150?img=6',
                           joinOrStart: 'PLAY',
+                          duration: 120,
+                          description: widget.description,
+                          // calendar_date: '',
+                          // day: '',
+                          // mainLocation: '',
+                          // subLocation: '',
                         ),
                       ),
                     );
@@ -192,7 +210,7 @@ class _BingoBoardState extends State<BingoBoard> {
           children: [
             // Event Name
             Text(
-              eventName,
+              widget.eventName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -203,7 +221,7 @@ class _BingoBoardState extends State<BingoBoard> {
             ),
 
             // host name
-            Text("Hosted By: $hostName", style: textTheme.titleSmall),
+            Text("Hosted By: ${widget.hostName}", style: textTheme.titleSmall),
 
             SizedBox(height: height * 0.05),
 
@@ -331,10 +349,16 @@ class _BingoBoardState extends State<BingoBoard> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => EventDetails(
-                        eventName: eventName,
-                        hostName: hostName,
+                        eventName: widget.eventName,
+                        hostName: widget.hostName,
                         hostPfp: 'https://i.pravatar.cc/150?img=6',
                         joinOrStart: 'PLAY',
+                        duration: 120,
+                        description: widget.description,
+                        // calendar_date: '15th October 2026',
+                        // day: 'Monday',
+                        // mainLocation: '',
+                        // subLocation: '',
                       ),
                     ),
                   );
@@ -376,14 +400,15 @@ class _BingoBoardState extends State<BingoBoard> {
                 ],
               ),
 
+              //Navigation to the leaderBoard, temporary navigation to GameMonitor
               GestureDetector(
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => GameMonitorScreen(
-                        eventName: eventName,
-                        time: 120,
+                        eventName: widget.eventName,
+                        time: timeLeft,
                         maxParticipants: "60",
                       ),
                     ),

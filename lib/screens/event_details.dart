@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'bingo_board.dart';
 import 'game_monitor.dart';
 
@@ -8,12 +7,25 @@ class EventDetails extends StatelessWidget {
   final String hostName;
   final String hostPfp;
   final String joinOrStart;
+  final int duration;
+  final String description;
+  // final String calendar_date;
+  // final String day;
+  // final String mainLocation;
+  // final String subLocation;
+
   const EventDetails({
     super.key,
     required this.eventName,
     required this.hostName,
     required this.hostPfp,
     required this.joinOrStart,
+    required this.duration,
+    required this.description,
+    // required this.calendar_date,
+    // required this.day,
+    // required this.mainLocation,
+    // required this.subLocation,
   });
 
   @override
@@ -25,21 +37,26 @@ class EventDetails extends StatelessWidget {
 
     // sample data
     final List<EventDetail> details = [
-      EventDetail(
-        icon: Icons.calendar_month,
-        mainDetail: "Oct 15, 2025",
-        subDetail: "Tuesday",
-      ),
+      // EventDetail(
+      //   icon: Icons.calendar_month,
+      //   mainDetail: calendar_date,
+      //   subDetail: day,
+      // ),
       EventDetail(
         icon: Icons.timer,
-        mainDetail: "6pm - 9pm",
-        subDetail: "Duration: 3 hrs",
+        mainDetail: "Duration",
+        subDetail: "$duration mins",
       ),
       EventDetail(
-        icon: Icons.location_on,
-        mainDetail: "Amrita University",
-        subDetail: "Main Auditorium",
+        icon: Icons.description,
+        mainDetail: "Description",
+        subDetail: description,
       ),
+      // EventDetail(
+      //   icon: Icons.location_on,
+      //   mainDetail: "Amrita University",
+      //   subDetail: "Main Auditorium",
+      // ),
     ];
 
     return Scaffold(
@@ -205,10 +222,19 @@ class EventDetails extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                if (joinOrStart == 'PLAY') {
+                if (joinOrStart == 'PLAY' || joinOrStart == 'RESUME') {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => BingoBoard()),
+                    MaterialPageRoute(
+                      builder: (context) => BingoBoard(
+                        eventName:
+                            'HacktoberFest', // to be fetched from backend
+                        hostName: 'amFOSS', // to be fetched from backend
+                        timelimit: duration,
+                        description:
+                            'Hacktober fest event description', // to be fetched from backend
+                      ),
+                    ),
                   );
                 } else if (joinOrStart == 'START') {
                   Navigator.push(
@@ -216,7 +242,7 @@ class EventDetails extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => GameMonitorScreen(
                         eventName: 'HacktoberFest 2026',
-                        time: 120,
+                        time: duration,
                         maxParticipants: '60',
                       ),
                     ),
@@ -245,7 +271,6 @@ class EventDetails extends StatelessWidget {
 }
 
 // CUSTOM WIDGET FOR DETAILS
-
 class DetailCard extends StatelessWidget {
   final IconData icon;
   final String mainDetail;
@@ -263,11 +288,9 @@ class DetailCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
 
     return Container(
       width: width * 0.9,
-      height: height * 0.12,
       padding: const EdgeInsets.all(20),
 
       decoration: BoxDecoration(
@@ -276,6 +299,7 @@ class DetailCard extends StatelessWidget {
       ),
 
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: colorScheme.primary, size: 36),
 
@@ -284,22 +308,28 @@ class DetailCard extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   mainDetail,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
                   ),
                 ),
 
-                SizedBox(height: height * 0.008),
+                const SizedBox(height: 6),
 
-                Text(
-                  subDetail,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                Flexible(
+                  child: Text(
+                    subDetail,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
               ],
@@ -311,7 +341,6 @@ class DetailCard extends StatelessWidget {
   }
 }
 
-//----------------------------------------------------------------
 // Class for sample data
 class EventDetail {
   final IconData icon;
