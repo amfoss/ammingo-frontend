@@ -227,12 +227,10 @@ class EventDetails extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => BingoBoard(
-                        eventName:
-                            'HacktoberFest', // to be fetched from backend
-                        hostName: 'amFOSS', // to be fetched from backend
+                        eventName: eventName,
+                        hostName: hostName,
                         timelimit: duration,
-                        description:
-                            'Hacktober fest event description', // to be fetched from backend
+                        description: description,
                       ),
                     ),
                   );
@@ -241,7 +239,7 @@ class EventDetails extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => GameMonitorScreen(
-                        eventName: 'HacktoberFest 2026',
+                        eventName: eventName,
                         time: duration,
                         maxParticipants: '60',
                       ),

@@ -73,6 +73,7 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       context,
       MaterialPageRoute(
         builder: (context) => EventDetails(
+          // to be fetched from backend
           eventName: 'amFOSS Praveshan 2026',
           hostName: 'amFOSS',
           hostPfp: 'https://i.pravatar.cc/150?img=6',
