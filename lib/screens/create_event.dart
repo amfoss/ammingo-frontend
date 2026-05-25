@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'game_monitor.dart';
+
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
   @override
@@ -220,7 +222,23 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   width: double.infinity,
                   height: height * 0.07,
                   child: ElevatedButton(
-                    onPressed: () {},
+                      onPressed: () {
+                        if (_eventNameController.text.isNotEmpty &&
+                            _timeLimitController.text.isNotEmpty &&
+                            _participantsController.text.isNotEmpty) {
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GameMonitorScreen(
+                                eventName: _eventNameController.text,
+                                time: int.parse(_timeLimitController.text),
+                                maxParticipants: _participantsController.text,
+                              ),
+                            ),
+                          );
+                        }
+                      },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,
                       foregroundColor: colorScheme.onPrimary,
