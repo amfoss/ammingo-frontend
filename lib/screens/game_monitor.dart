@@ -403,7 +403,6 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
             icon: Icon(Icons.emoji_events_rounded, color: colorScheme.primary),
             tooltip: "View Leaderboard",
             onPressed: () {
-              // Make sure to import your leaderboard screen at the top of this file:
               Navigator.push(
                 context,
                 MaterialPageRoute(
