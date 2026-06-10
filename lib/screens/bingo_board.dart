@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:amingo/screens/event_details.dart';
-import 'package:amingo/screens/game_monitor.dart';
 import 'package:flutter/material.dart';
 import 'bingo_tile.dart';
 import 'package:amingo/screens/leaderboard_screen.dart';
