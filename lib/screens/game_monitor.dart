@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:amingo/screens/leaderboard_screen.dart';
 
 class GameMonitorScreen extends StatefulWidget {
   final String eventName;
@@ -397,6 +398,22 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
             letterSpacing: 0.8,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.emoji_events_rounded, color: colorScheme.primary),
+            tooltip: "View Leaderboard",
+            onPressed: () {
+              // Make sure to import your leaderboard screen at the top of this file:
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LeaderboardScreen(),
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
