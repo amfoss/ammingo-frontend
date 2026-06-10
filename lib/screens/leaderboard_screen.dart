@@ -13,6 +13,7 @@ class LeaderboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
         title: Text(
           "LEADERBOARD",
           style: TextStyle(
