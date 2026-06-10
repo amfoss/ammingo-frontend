@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:amingo/screens/event_details.dart';
-import 'package:amingo/screens/game_monitor.dart';
 import 'package:flutter/material.dart';
 import 'bingo_tile.dart';
+import 'package:amingo/screens/leaderboard_screen.dart';
 
 class BingoBoard extends StatefulWidget {
   final String eventName;
@@ -361,14 +361,10 @@ class _BingoBoardState extends State<BingoBoard> {
 
               GestureDetector(
                 onTap: () {
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => GameMonitorScreen(
-                        eventName: widget.eventName,
-                        time: (timeLeft / 60).ceil(),
-                        maxParticipants: "60",
-                      ),
+                      builder: (context) => const LeaderboardScreen(),
                     ),
                   );
                 },
@@ -376,7 +372,7 @@ class _BingoBoardState extends State<BingoBoard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.bar_chart, color: colorScheme.onSurface),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       "RANKS",
                       style: textTheme.labelSmall?.copyWith(
