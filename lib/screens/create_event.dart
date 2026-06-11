@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'event_details.dart';
 
 class CreateEventScreen extends StatefulWidget {
@@ -13,12 +12,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _timeLimitController = TextEditingController();
   final TextEditingController _participantsController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   @override
   void dispose() {
     _eventNameController.dispose();
     _descriptionController.dispose();
     _timeLimitController.dispose();
     _participantsController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -69,7 +70,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: height * 0.05),
+                SizedBox(height: height * 0.03),
                 Text(
                   "Event Description",
                   style: TextStyle(
@@ -100,7 +101,39 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   ),
                 ),
 
-                SizedBox(height: height * 0.05),
+                SizedBox(height: height * 0.03),
+
+                Text(
+                  "Location",
+                  style: TextStyle(
+                    color: colorScheme.primary,
+                    fontSize: width * 0.04,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: height * 0.01),
+                TextField(
+                  style: TextStyle(color: colorScheme.onSurface),
+                  cursorColor: colorScheme.primary,
+                  controller: _locationController,
+                  decoration: InputDecoration(
+                    hintText: "Enter the location of the event",
+                    hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: colorScheme.outline),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: colorScheme.primary,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: height * 0.03),
 
                 Text(
                   "Time Limit",
@@ -142,7 +175,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: height * 0.05),
+                SizedBox(height: height * 0.03),
                 Text(
                   "Maximum Participants",
                   style: TextStyle(
@@ -191,25 +224,36 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     onPressed: () {
                       if (_eventNameController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Event name is required")),
+                          const SnackBar(
+                            content: Text("Event name is required"),
+                          ),
                         );
                         return;
                       }
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EventDetails(
-                            eventName: _eventNameController.text,
-                            hostName: "amFOSS", //Host name fetch from backend
-                            hostPfp: 'https://i.pravatar.cc/150?img=6',
-                            joinOrStart: 'START',
-                            duration:
-                                int.tryParse(_timeLimitController.text) ?? 0,
-                            description: _descriptionController.text,
+                      if (_timeLimitController.text.isNotEmpty &&
+                          _participantsController.text.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EventDetails(
+                              eventName: _eventNameController.text,
+                              hostName:
+                                  "amFOSS", // Host name fetch from backend
+                              hostPfp: 'https://i.pravatar.cc/150?img=6',
+                              joinOrStart: 'START',
+                              duration:
+                                  int.tryParse(_timeLimitController.text) ?? 0,
+                              description: _descriptionController.text,
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please fill in all required fields"),
+                          ),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colorScheme.primary,

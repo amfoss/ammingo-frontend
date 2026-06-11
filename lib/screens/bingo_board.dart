@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'package:amingo/screens/event_details.dart';
-import 'package:amingo/screens/game_monitor.dart';
-import 'package:amingo/screens/role_selection.dart';
 import 'package:flutter/material.dart';
 import 'bingo_tile.dart';
 import 'friend_verification.dart';
+import 'package:amingo/screens/leaderboard_screen.dart';
 
 class BingoBoard extends StatefulWidget {
   final String eventName;
@@ -159,12 +158,8 @@ class _BingoBoardState extends State<BingoBoard> {
                           hostName: widget.hostName,
                           hostPfp: 'https://i.pravatar.cc/150?img=6',
                           joinOrStart: 'PLAY',
-                          duration: 120,
+                          duration: widget.timelimit,
                           description: widget.description,
-                          // calendar_date: '',
-                          // day: '',
-                          // mainLocation: '',
-                          // subLocation: '',
                         ),
                       ),
                     );
@@ -192,7 +187,9 @@ class _BingoBoardState extends State<BingoBoard> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Roleselection()),
+                      MaterialPageRoute(
+                        builder: (context) => LeaderboardScreen(),
+                      ),
                     ); // to be navigated to the profile page
                   },
                 ),
@@ -353,12 +350,8 @@ class _BingoBoardState extends State<BingoBoard> {
                         hostName: widget.hostName,
                         hostPfp: 'https://i.pravatar.cc/150?img=6',
                         joinOrStart: 'PLAY',
-                        duration: 120,
+                        duration: widget.timelimit,
                         description: widget.description,
-                        // calendar_date: '15th October 2026',
-                        // day: 'Monday',
-                        // mainLocation: '',
-                        // subLocation: '',
                       ),
                     ),
                   );
@@ -400,17 +393,12 @@ class _BingoBoardState extends State<BingoBoard> {
                 ],
               ),
 
-              //Navigation to the leaderBoard, temporary navigation to GameMonitor
               GestureDetector(
                 onTap: () {
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => GameMonitorScreen(
-                        eventName: widget.eventName,
-                        time: timeLeft,
-                        maxParticipants: "60",
-                      ),
+                      builder: (context) => const LeaderboardScreen(),
                     ),
                   );
                 },
@@ -418,7 +406,7 @@ class _BingoBoardState extends State<BingoBoard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.bar_chart, color: colorScheme.onSurface),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       "RANKS",
                       style: textTheme.labelSmall?.copyWith(
