@@ -198,7 +198,7 @@ class _BingoBoardState extends State<BingoBoard> {
                               'full stack developer // open source enthusiasts // hiii there ',
                         ),
                       ),
-                    ); // to be navigated to the profile page
+                    );
                   },
                 ),
               ],
