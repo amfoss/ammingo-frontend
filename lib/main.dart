@@ -1,5 +1,6 @@
 import 'package:amingo/providers/theme_provider.dart';
 import 'package:amingo/screens/login_screen.dart';
+import 'package:amingo/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -177,16 +178,28 @@ class _EmailInputState extends State<HomeScreen> {
                     width: double.infinity,
                     height: height * 0.07,
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         String email = _controller.text.trim();
 
-                        if (validateEmail(email) == true) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LoginScreen(email: email),
-                            ),
-                          );
+                        if (validateEmail(email)) {
+                          try {
+                            await AuthService().sendOtp(email);
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginScreen(email: email),
+                              ),
+                            );
+                          }catch (e) {
+                            debugPrint(e.toString());
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(e.toString()),
+                              ),
+                            );
+                          }
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
