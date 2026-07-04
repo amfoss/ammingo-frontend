@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'event_details.dart';
-
+import 'package:amingo/services/auth_service.dart';
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
   @override
@@ -13,6 +13,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   final TextEditingController _timeLimitController = TextEditingController();
   final TextEditingController _participantsController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
+  final AuthService _authService = AuthService();
+
   @override
   void dispose() {
     _eventNameController.dispose();
@@ -221,7 +223,16 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   width: double.infinity,
                   height: height * 0.07,
                   child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      final response = await _authService.createGame(
+                        description: _descriptionController.text,
+                        location: _locationController.text,
+                        duration: int.parse(_timeLimitController.text),
+                      );
+
+                      final joinCode = response.data["join_code"];
+                      final gameId = response.data["game_id"];
+                      final qrImage = response.data["qr_img"];
                       if (_eventNameController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -230,27 +241,42 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         );
                         return;
                       }
-                      if (_timeLimitController.text.isNotEmpty &&
-                          _participantsController.text.isNotEmpty) {
+                      if (_timeLimitController.text.isEmpty ||
+                          _participantsController.text.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please fill in all required fields"),
+                          ),
+                        );
+                        return;
+                      }
+                      try {
+                        await _authService.createGame(
+                          description: _descriptionController.text,
+                          location: _locationController.text,
+                          duration: int.parse(_timeLimitController.text),
+                        );
+                        if (!mounted) return;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => EventDetails(
                               eventName: _eventNameController.text,
-                              hostName:
-                                  "amFOSS", // Host name fetch from backend
-                              hostPfp: 'https://i.pravatar.cc/150?img=6',
-                              joinOrStart: 'START',
-                              duration:
-                                  int.tryParse(_timeLimitController.text) ?? 0,
+                              hostName: "amFOSS",
+                              hostPfp: "https://i.pravatar.cc/150?img=6",
+                              joinOrStart: "START",
+                              duration: int.parse(_timeLimitController.text),
                               description: _descriptionController.text,
+                              joinCode: joinCode,
+                              qrImage: qrImage,
                             ),
                           ),
                         );
-                      } else {
+                      } catch (e) {
+                        if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Please fill in all required fields"),
+                          SnackBar(
+                            content: Text("Failed to create event: $e"),
                           ),
                         );
                       }

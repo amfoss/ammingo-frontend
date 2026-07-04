@@ -1,7 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 
 class AuthService {
+  static const _storage = FlutterSecureStorage();
+  static final CookieJar _cookieJar = CookieJar();
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: "http://127.0.0.1:8000/api",
@@ -10,6 +16,11 @@ class AuthService {
       },
     ),
   );
+  AuthService() {
+    _dio.interceptors.add(
+      CookieManager(_cookieJar),
+    );
+  }
 
   static const String baseUrl = "http://10.239.135.182:8000";
 
@@ -21,7 +32,9 @@ class AuthService {
       },
     );
   }
-
+  static Future<void> saveToken(String token) async {
+    await _storage.write(key: "access_token", value: token);
+  }
   Future<void> resendOtp(String email) async {
     await sendOtp(email);
   }
@@ -30,16 +43,20 @@ class AuthService {
       String email,
       String otp,
       ) async {
-    return await _dio.post(
+    final response = await _dio.post(
       "/login/verify-otp",
       data: {
         "email": email,
         "otp": otp,
       },
     );
+    print(response.headers.map);
+    return response;
   }
 
   Future<Response> joinGame(String code) async {
+    final token = await _storage.read(key: "access_token");
+    _dio.options.headers["Cookie"] = "access_token=$token";
     return await _dio.post(
       "/games/join/$code",
       data: {},
@@ -63,5 +80,30 @@ class AuthService {
       ),
     );
     return Uri.parse(result).queryParameters["token"];
+  }
+  void setAuthToken(String token) {
+    _dio.options.headers["Authorization"] = "Bearer $token";
+  }
+  Future<Response> createGame({
+    required String description,
+    required String location,
+    required int duration,
+  }) async {
+    final token = await _storage.read(key: "access_token");
+
+    print("Token: $token");
+
+    _dio.options.headers["Cookie"] = "access_token=$token";
+
+    print(_dio.options.headers);
+
+    return await _dio.post(
+      "/games",
+      data: {
+        "description": description,
+        "location": location,
+        "duration": duration,
+      },
+    );
   }
 }

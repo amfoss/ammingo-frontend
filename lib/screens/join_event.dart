@@ -69,16 +69,22 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       final gameResponse = await auth.getGameDetails(code);
       final game = gameResponse.data;
       if (!mounted) return;
+      final startTime = DateTime.parse(game["start_time"]);
+      final endTime = DateTime.parse(game["end_time"]);
+      final String qrImage = game["qr_img"];
+      final duration = endTime.difference(startTime).inMinutes;
 
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => EventDetails(
+            qrImage: "",
+            joinCode: "",
             eventName: "Event Name", //to be added
             hostName: "Host", //to be added
             hostPfp: "https://i.pravatar.cc/150?img=6",
             joinOrStart: "PLAY",
-            duration: 0,
+            duration: duration,
             description: game["description"] ?? "",
             participantCount: lobbyResponse.data["player_count"],
           ),
@@ -237,18 +243,19 @@ class _JoinEventScreenState extends State<JoinEventScreen>
                                     setState(() {
                                       qrResult = barcodes.first.rawValue!;
                                     });
+                                    print("QR Result: $qrResult");
                                     final uri = Uri.tryParse(qrResult);
-                                    if (uri != null &&
-                                        await canLaunchUrl(uri)) {
-                                      await launchUrl(uri);
-                                      isScanned = false;
+
+                                    if (uri != null) {
+                                      final code = uri.pathSegments.last;
+
+                                      _codeController.text = code;
+
+                                      await _handleJoinEvent();
                                     } else {
                                       messenger.showSnackBar(
-                                        SnackBar(
-                                          content: const Text(
-                                            "Invalid QR Code",
-                                          ),
-                                          backgroundColor: Colors.red.shade400,
+                                        const SnackBar(
+                                          content: Text("Invalid QR Code"),
                                         ),
                                       );
                                     }
@@ -489,7 +496,6 @@ class _JoinEventScreenState extends State<JoinEventScreen>
                             codeInput = value;
                           });
                         },
-                        keyboardType: const TextInputType.numberWithOptions(),
                         style: TextStyle(
                           color: colorScheme.onSurface,
                           letterSpacing: 8,

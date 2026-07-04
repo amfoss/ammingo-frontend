@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'bingo_board.dart';
 import 'game_monitor.dart';
-
+import 'dart:convert';
 class EventDetails extends StatefulWidget {
   final String eventName;
   final String hostName;
@@ -9,19 +9,22 @@ class EventDetails extends StatefulWidget {
   final String joinOrStart;
   final int duration;
   final String description;
-
+  final String joinCode;
+  final String qrImage;
   final int participantCount;
   final String initialGridSize;
   final Function(String)? onGridSizeChanged;
 
   const EventDetails({
     super.key,
+    required this.qrImage,
     required this.eventName,
     required this.hostName,
     required this.hostPfp,
     required this.joinOrStart,
     required this.duration,
     required this.description,
+    required this.joinCode,
     this.participantCount = 0,
     this.initialGridSize = '5 x 5',
     this.onGridSizeChanged,
@@ -38,6 +41,7 @@ class _EventDetailsState extends State<EventDetails> {
   void initState() {
     super.initState();
     _selectedGridSize = widget.initialGridSize;
+    print(widget.qrImage);
   }
 
   @override
@@ -73,6 +77,12 @@ class _EventDetailsState extends State<EventDetails> {
     final height = MediaQuery.of(context).size.height;
 
     final List<EventDetail> details = [
+      if (widget.joinOrStart == "START")
+        EventDetail(
+          icon: Icons.key,
+          mainDetail: "Join Code",
+          subDetail: widget.joinCode,
+        ),
       EventDetail(
         icon: Icons.timer,
         mainDetail: "Duration",
@@ -180,7 +190,7 @@ class _EventDetailsState extends State<EventDetails> {
                               widget.hostPfp,
                               width: 45,
                               height: 45,
-                              fit: BoxFit.cover,
+                              fit: BoxFit.contain,
                               errorBuilder: (context, error, stackTrace) =>
                                   const Icon(Icons.person, size: 45),
                             ),
@@ -212,7 +222,6 @@ class _EventDetailsState extends State<EventDetails> {
                 ),
 
                 SizedBox(height: height * 0.03),
-
                 Column(
                   children: details.map((item) {
                     return Padding(
@@ -226,6 +235,40 @@ class _EventDetailsState extends State<EventDetails> {
                   }).toList(),
                 ),
 
+                if (widget.joinOrStart == "START") ...[
+                  const SizedBox(height: 20),
+
+                  Text(
+                    "QR Code",
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.memory(
+                      base64Decode(widget.qrImage.split(',').last),
+                      width: 220,
+                      height: 220,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  SelectableText(
+                    widget.joinCode,
+                    style: textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 3,
+                    ),
+                  ),
+                ],
+
+                SizedBox(height: height * 0.15),
                 SizedBox(height: height * 0.15),
               ],
             ),
@@ -355,6 +398,7 @@ class _EventDetailsState extends State<EventDetails> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => BingoBoard(
+                            joinCode: widget.joinCode,
                             eventName: widget.eventName,
                             hostName: widget.hostName,
                             timelimit: widget.duration,
@@ -390,6 +434,7 @@ class _EventDetailsState extends State<EventDetails> {
                   ),
                 ),
               ),
+
             ],
           ),
         ),

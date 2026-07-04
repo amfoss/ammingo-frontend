@@ -9,6 +9,7 @@ class BingoBoard extends StatefulWidget {
   final String eventName;
   final String hostName;
   final int timelimit;
+  final String joinCode;
   final String description;
 
   const BingoBoard({
@@ -16,6 +17,7 @@ class BingoBoard extends StatefulWidget {
     required this.eventName,
     required this.hostName,
     required this.timelimit,
+    required this.joinCode,
     required this.description,
   });
 
@@ -154,6 +156,8 @@ class _BingoBoardState extends State<BingoBoard> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => EventDetails(
+                          qrImage: "",
+                          joinCode: "",
                           eventName: widget.eventName,
                           hostName: widget.hostName,
                           hostPfp: 'https://i.pravatar.cc/150?img=6',
@@ -346,6 +350,8 @@ class _BingoBoardState extends State<BingoBoard> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => EventDetails(
+                        qrImage: "",
+                        joinCode: widget.joinCode,
                         eventName: widget.eventName,
                         hostName: widget.hostName,
                         hostPfp: 'https://i.pravatar.cc/150?img=6',
