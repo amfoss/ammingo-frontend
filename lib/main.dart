@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'styles/theme_data.dart';
+import 'package:amingo/services/auth_service.dart';
+import 'package:amingo/screens/enter_username.dart';
 
 bool validateEmail(String email) {
   return EmailValidator.validate(email);
@@ -253,7 +255,17 @@ class _EmailInputState extends State<HomeScreen> {
                     width: double.infinity,
                     height: height * 0.07,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final token = await AuthService().signInWithGoogle();
+                        if (token != null) {
+                          print("Got token: $token");
+                          if (!context.mounted) return;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const CreateUsername()),
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.surface,
                         foregroundColor: colorScheme.onSurface,

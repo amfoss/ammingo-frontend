@@ -328,7 +328,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final token = await AuthService().signInWithGoogle();
+                    if (token != null) {
+                      print("Got token: $token");
+                      if (!context.mounted) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const CreateUsername()),
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.surface,
                     foregroundColor: colorScheme.onSurface,
