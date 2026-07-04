@@ -1,10 +1,123 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:amingo/screens/enter_username.dart';
-
-class LoginScreen extends StatelessWidget {
+import 'package:amingo/services/auth_service.dart';
+import 'dart:async';
+class LoginScreen extends StatefulWidget {
   final String email;
-  const LoginScreen({super.key, required this.email});
+  const LoginScreen({
+    super.key,
+    required this.email,
+  });
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController otpController = TextEditingController();
+  bool isLoading = false;
+  bool isResending = false;
+  int countdown = 30;
+  Timer? timer;
+  void startTimer() {
+    setState(() {
+      countdown = 30;
+    });
+    timer?.cancel();
+    timer = Timer.periodic(
+      const Duration(seconds: 1),
+          (timer) {
+        if (countdown == 0) {
+          timer.cancel();
+        } else {
+          setState(() {
+            countdown--;
+          });
+        }
+      },
+    );
+  }
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+  @override
+  void dispose() {
+    otpController.dispose();
+    timer?.cancel();
+    super.dispose();
+  }
+  Future<void> resendOtp() async {
+    setState(() {
+      isResending = true;
+    });
+
+    try {
+      await AuthService().resendOtp(widget.email);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text("A new OTP has been sent")
+        ),
+      );
+
+      startTimer();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to resend OTP"),
+        ),
+      );
+    }
+
+    if (!mounted) return;
+    setState(() {
+      isResending = false;
+    });
+  }
+  Future<void> login() async {
+    if (otpController.text.trim().length != 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Enter a valid 6-digit OTP"),
+        ),
+      );
+      return;
+    }
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      await AuthService().verifyOtp(
+        widget.email,
+        otpController.text.trim(),
+      );
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const CreateUsername(),
+        ),
+      );
+    } on DioException catch (e) {
+      final message =
+          e.response?.data["detail"] ??
+              "Something went wrong";
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    }
+    if (!mounted) return;
+    setState(() {
+      isLoading = false;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -35,7 +148,6 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               Center(
                 child: Text(
                   "Enter the OTP to sign into your account.",
@@ -46,9 +158,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               SizedBox(height: height * 0.02),
-
               Text(
                 "Email Address",
                 style: TextStyle(
@@ -56,11 +166,9 @@ class LoginScreen extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-
               SizedBox(height: height * 0.01),
-
               TextField(
-                controller: TextEditingController(text: email),
+                controller: TextEditingController(text: widget.email),
                 readOnly: true,
                 style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
@@ -99,7 +207,8 @@ class LoginScreen extends StatelessWidget {
               SizedBox(height: height * 0.01),
 
               TextField(
-                maxLength: 4,
+                controller: otpController,
+                maxLength: 6,
                 keyboardType: TextInputType.number,
                 style: TextStyle(
                   color: colorScheme.onSurface,
@@ -107,13 +216,17 @@ class LoginScreen extends StatelessWidget {
                 ),
                 cursorColor: colorScheme.primary,
                 decoration: InputDecoration(
-                  hintText: "1111",
-                  hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                  hintText: "123456",
+                  hintStyle: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                   filled: true,
                   fillColor: colorScheme.surface,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: colorScheme.outline),
+                    borderSide: BorderSide(
+                      color: colorScheme.outline,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -131,14 +244,7 @@ class LoginScreen extends StatelessWidget {
                 width: double.infinity,
                 height: height * 0.06,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CreateUsername(),
-                      ),
-                    );
-                  },
+                  onPressed: isLoading ? null : login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
@@ -146,7 +252,16 @@ class LoginScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
+                  child: isLoading
+                      ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                      : Text(
                     "LOGIN",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -162,21 +277,27 @@ class LoginScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Resend OTP",
-                    style: TextStyle(
-                      color: colorScheme.primary,
-                      fontSize: width * 0.04,
-                      fontWeight: FontWeight.w600,
+                  GestureDetector(
+                    onTap: countdown == 0 && !isResending
+                        ? resendOtp
+                        : null,
+                    child: Text(
+                      "Resend OTP",
+                      style: TextStyle(
+                        color: countdown == 0
+                            ? colorScheme.primary
+                            : Colors.grey,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  SizedBox(width: width * 0.01),
-                  Text(
-                    "in 10 seconds",
-                    style: TextStyle(
-                      color: colorScheme.onSurfaceVariant,
-                      fontSize: width * 0.04,
-                    ),
+                  const SizedBox(width: 6),
+                  countdown > 0
+                      ? Text(
+                    "in $countdown seconds",
+                  )
+                      : const Text(
+                    "now",
                   ),
                 ],
               ),
@@ -207,7 +328,17 @@ class LoginScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final token = await AuthService().signInWithGoogle();
+                    if (token != null) {
+                      print("Got token: $token");
+                      if (!context.mounted) return;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const CreateUsername()),
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.surface,
                     foregroundColor: colorScheme.onSurface,

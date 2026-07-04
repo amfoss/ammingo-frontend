@@ -1,8 +1,9 @@
-import 'package:amingo/screens/event_details.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:dio/dio.dart';
+import 'package:amingo/services/auth_service.dart';
+import 'package:amingo/screens/event_details.dart';
 class JoinEventScreen extends StatefulWidget {
   const JoinEventScreen({super.key});
   @override
@@ -37,14 +38,14 @@ class _JoinEventScreenState extends State<JoinEventScreen>
     super.dispose();
   }
 
-  void _handleJoinEvent() {
+  Future<void> _handleJoinEvent() async {
     final code = _codeController.text.trim();
+
     if (code.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text("Please enter a 6-digit code"),
           backgroundColor: Colors.red.shade400,
-          duration: const Duration(seconds: 2),
         ),
       );
       return;
@@ -55,34 +56,50 @@ class _JoinEventScreenState extends State<JoinEventScreen>
         SnackBar(
           content: const Text("Code must be exactly 6 digits"),
           backgroundColor: Colors.orange.shade400,
-          duration: const Duration(seconds: 2),
         ),
       );
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text("Successfully joined the event!"),
-        backgroundColor: Colors.green.shade400,
-        duration: const Duration(seconds: 3),
-      ),
-    );
+    try {
+      final auth = AuthService();
+      await auth.joinGame(code);
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EventDetails(
-          eventName: 'amFOSS Praveshan 2026',
-          hostName: 'amFOSS',
-          hostPfp: 'https://i.pravatar.cc/150?img=6',
-          joinOrStart: 'PLAY',
-          duration: 160,
-          description:
-              'The entry to amfoss event, join now. contribute to open source',
+      final lobbyResponse = await auth.getLobby(code);
+      final gameResponse = await auth.getGameDetails(code);
+      final game = gameResponse.data;
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => EventDetails(
+            eventName: "Event Name", //to be added
+            hostName: "Host", //to be added
+            hostPfp: "https://i.pravatar.cc/150?img=6",
+            joinOrStart: "PLAY",
+            duration: 0,
+            description: game["description"] ?? "",
+            participantCount: lobbyResponse.data["player_count"],
+          ),
         ),
-      ),
-    );
+      );
+    } on DioException catch (e) {
+      if (!mounted) return;
+
+      String message = "Failed to join event";
+
+      if (e.response?.data is Map &&
+          e.response!.data["detail"] != null) {
+        message = e.response!.data["detail"].toString();
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+        ),
+      );
+    }
   }
 
   @override
@@ -176,8 +193,6 @@ class _JoinEventScreenState extends State<JoinEventScreen>
                 ),
 
                 SizedBox(height: height * 0.03),
-
-                // QR Scanner Section
                 Text(
                   "Scan QR Code",
                   style: TextStyle(
@@ -246,7 +261,6 @@ class _JoinEventScreenState extends State<JoinEventScreen>
                                 },
                               ),
                             ),
-                            // Animated scanning line
                             AnimatedBuilder(
                               animation: animation,
                               builder: (context, child) {
@@ -270,7 +284,6 @@ class _JoinEventScreenState extends State<JoinEventScreen>
                                 );
                               },
                             ),
-                            // Corner indicators
                             Positioned(
                               top: 0,
                               left: 0,
@@ -415,7 +428,6 @@ class _JoinEventScreenState extends State<JoinEventScreen>
 
                 SizedBox(height: height * 0.03),
 
-                // Divider with OR
                 Row(
                   children: [
                     Expanded(
@@ -447,7 +459,6 @@ class _JoinEventScreenState extends State<JoinEventScreen>
 
                 SizedBox(height: height * 0.03),
 
-                // Code Input Section
                 Text(
                   "Enter 6-Digit Code",
                   style: TextStyle(
