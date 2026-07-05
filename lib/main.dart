@@ -193,13 +193,11 @@ class _EmailInputState extends State<HomeScreen> {
                                 builder: (context) => LoginScreen(email: email),
                               ),
                             );
-                          }catch (e) {
+                          } catch (e) {
                             debugPrint(e.toString());
 
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(e.toString()),
-                              ),
+                              SnackBar(content: Text(e.toString())),
                             );
                           }
                         } else {
@@ -256,13 +254,18 @@ class _EmailInputState extends State<HomeScreen> {
                     height: height * 0.07,
                     child: ElevatedButton(
                       onPressed: () async {
-                        final token = await AuthService().signInWithGoogle();
+                        final authService = AuthService();
+                        final token = await authService.signInWithGoogle();
                         if (token != null) {
+                          await AuthService.saveToken(token);             
                           print("Got token: $token");
                           if (!context.mounted) return;
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const CreateUsername()),
+                            MaterialPageRoute(
+                              builder: (context) => const CreateUsername(),
+                            ),
+                            
                           );
                         }
                       },

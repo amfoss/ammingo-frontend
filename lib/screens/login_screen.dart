@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:amingo/screens/enter_username.dart';
 import 'package:amingo/services/auth_service.dart';
 import 'dart:async';
+
 class LoginScreen extends StatefulWidget {
   final String email;
-  const LoginScreen({
-    super.key,
-    required this.email,
-  });
+  const LoginScreen({super.key, required this.email});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController otpController = TextEditingController();
   bool isLoading = false;
@@ -24,30 +23,30 @@ class _LoginScreenState extends State<LoginScreen> {
       countdown = 30;
     });
     timer?.cancel();
-    timer = Timer.periodic(
-      const Duration(seconds: 1),
-          (timer) {
-        if (countdown == 0) {
-          timer.cancel();
-        } else {
-          setState(() {
-            countdown--;
-          });
-        }
-      },
-    );
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (countdown == 0) {
+        timer.cancel();
+      } else {
+        setState(() {
+          countdown--;
+        });
+      }
+    });
   }
+
   @override
   void initState() {
     super.initState();
     startTimer();
   }
+
   @override
   void dispose() {
     otpController.dispose();
     timer?.cancel();
     super.dispose();
   }
+
   Future<void> resendOtp() async {
     setState(() {
       isResending = true;
@@ -56,20 +55,16 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await AuthService().resendOtp(widget.email);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text("A new OTP has been sent")
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("A new OTP has been sent")));
 
       startTimer();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Failed to resend OTP"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Failed to resend OTP")));
     }
 
     if (!mounted) return;
@@ -77,12 +72,11 @@ class _LoginScreenState extends State<LoginScreen> {
       isResending = false;
     });
   }
+
   Future<void> login() async {
     if (otpController.text.trim().length != 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Enter a valid 6-digit OTP"),
-        ),
+        const SnackBar(content: Text("Enter a valid 6-digit OTP")),
       );
       return;
     }
@@ -90,34 +84,26 @@ class _LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
     try {
-      await AuthService().verifyOtp(
-        widget.email,
-        otpController.text.trim(),
-      );
+      await AuthService().verifyOtp(widget.email, otpController.text.trim());
       if (!mounted) return;
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (_) => const CreateUsername(),
-        ),
+        MaterialPageRoute(builder: (_) => const CreateUsername()),
       );
     } on DioException catch (e) {
-      final message =
-          e.response?.data["detail"] ??
-              "Something went wrong";
+      final message = e.response?.data["detail"] ?? "Something went wrong";
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
     if (!mounted) return;
     setState(() {
       isLoading = false;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -217,16 +203,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 cursorColor: colorScheme.primary,
                 decoration: InputDecoration(
                   hintText: "123456",
-                  hintStyle: TextStyle(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                  hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                   filled: true,
                   fillColor: colorScheme.surface,
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: colorScheme.outline,
-                    ),
+                    borderSide: BorderSide(color: colorScheme.outline),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -254,21 +236,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   child: isLoading
                       ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : Text(
-                    "LOGIN",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: width * 0.05,
-                      letterSpacing: 1,
-                    ),
-                  ),
+                          "LOGIN",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: width * 0.05,
+                            letterSpacing: 1,
+                          ),
+                        ),
                 ),
               ),
 
@@ -278,9 +260,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: countdown == 0 && !isResending
-                        ? resendOtp
-                        : null,
+                    onTap: countdown == 0 && !isResending ? resendOtp : null,
                     child: Text(
                       "Resend OTP",
                       style: TextStyle(
@@ -293,12 +273,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(width: 6),
                   countdown > 0
-                      ? Text(
-                    "in $countdown seconds",
-                  )
-                      : const Text(
-                    "now",
-                  ),
+                      ? Text("in $countdown seconds")
+                      : const Text("now"),
                 ],
               ),
 
@@ -335,7 +311,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (!context.mounted) return;
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const CreateUsername()),
+                        MaterialPageRoute(
+                          builder: (context) => const CreateUsername(),
+                        ),
                       );
                     }
                   },
