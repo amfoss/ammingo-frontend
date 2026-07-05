@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'event_details.dart';
 import 'package:amingo/services/auth_service.dart';
+
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({super.key});
   @override
@@ -275,9 +276,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       } catch (e) {
                         if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Failed to create event: $e"),
-                          ),
+                          SnackBar(content: Text("Failed to create event: $e")),
                         );
                       }
                     },

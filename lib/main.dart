@@ -193,13 +193,11 @@ class _EmailInputState extends State<HomeScreen> {
                                 builder: (context) => LoginScreen(email: email),
                               ),
                             );
-                          }catch (e) {
+                          } catch (e) {
                             debugPrint(e.toString());
 
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(e.toString()),
-                              ),
+                              SnackBar(content: Text(e.toString())),
                             );
                           }
                         } else {

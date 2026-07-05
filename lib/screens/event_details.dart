@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'bingo_board.dart';
 import 'game_monitor.dart';
 import 'dart:convert';
+
 class EventDetails extends StatefulWidget {
   final String eventName;
   final String hostName;
@@ -434,7 +435,6 @@ class _EventDetailsState extends State<EventDetails> {
                   ),
                 ),
               ),
-
             ],
           ),
         ),

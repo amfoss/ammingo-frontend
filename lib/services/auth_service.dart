@@ -17,21 +17,15 @@ class AuthService {
     ),
   );
   AuthService() {
-    _dio.interceptors.add(
-      CookieManager(_cookieJar),
-    );
+    _dio.interceptors.add(CookieManager(_cookieJar));
   }
 
   static const String baseUrl = "http://10.239.135.182:8000";
 
   Future<void> sendOtp(String email) async {
-    await _dio.post(
-      "/login/email",
-      data: {
-        "email": email,
-      },
-    );
+    await _dio.post("/login/email", data: {"email": email});
   }
+
   static Future<void> saveToken(String token) async {
     await _storage.write(key: "access_token", value: token);
   }
@@ -56,10 +50,7 @@ class AuthService {
   Future<Response> joinGame(String code) async {
     final token = await _storage.read(key: "access_token");
     _dio.options.headers["Cookie"] = "access_token=$token";
-    return await _dio.post(
-      "/games/join/$code",
-      data: {},
-    );
+    return await _dio.post("/games/join/$code", data: {});
   }
 
   Future<Response> getLobby(String code) async {
@@ -80,9 +71,11 @@ class AuthService {
     );
     return Uri.parse(result).queryParameters["token"];
   }
+
   void setAuthToken(String token) {
     _dio.options.headers["Authorization"] = "Bearer $token";
   }
+
   Future<Response> createGame({
     required String description,
     required String location,

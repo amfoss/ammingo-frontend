@@ -3,6 +3,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:dio/dio.dart';
 import 'package:amingo/services/auth_service.dart';
 import 'package:amingo/screens/event_details.dart';
+
 class JoinEventScreen extends StatefulWidget {
   const JoinEventScreen({super.key});
   @override
@@ -93,16 +94,13 @@ class _JoinEventScreenState extends State<JoinEventScreen>
 
       String message = "Failed to join event";
 
-      if (e.response?.data is Map &&
-          e.response!.data["detail"] != null) {
+      if (e.response?.data is Map && e.response!.data["detail"] != null) {
         message = e.response!.data["detail"].toString();
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
