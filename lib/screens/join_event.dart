@@ -78,15 +78,15 @@ class _JoinEventScreenState extends State<JoinEventScreen>
         MaterialPageRoute(
           builder: (_) => EventDetails(
             qrImage: "",
-            joinCode: "",
-            eventName: "Event Name", //to be added
-            hostName: "Host", //to be added
+            joinCode: code,
+            eventName: "Event Name",
+            hostName: "Host",
             hostPfp: "https://i.pravatar.cc/150?img=6",
             joinOrStart: "PLAY",
             duration: duration,
             description: game["description"] ?? "",
             participantCount: lobbyResponse.data["player_count"],
-          ),
+          )
         ),
       );
     } on DioException catch (e) {
