@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:amingo/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:amingo/screens/leaderboard_screen.dart';
 
@@ -7,12 +7,14 @@ class GameMonitorScreen extends StatefulWidget {
   final String eventName;
   final int time;
   final String maxParticipants;
+  final String joinCode;
 
   const GameMonitorScreen({
     super.key,
     required this.eventName,
     required this.time,
     required this.maxParticipants,
+    required this.joinCode,
   });
 
   @override
@@ -22,26 +24,68 @@ class GameMonitorScreen extends StatefulWidget {
 class _GameMonitorScreenState extends State<GameMonitorScreen> {
   late int remainingSeconds;
   Timer? timer;
+  Timer? statusTimer;
+  int tilesDone = 0;
+  int activePlayers = 0;
+  String maxCap = '0';
 
   @override
   void initState() {
     super.initState();
     remainingSeconds = widget.time * 60;
+    maxCap = widget.maxParticipants;
+    _startTimers();
+    _fetchStatus();
+  }
+
+  void _startTimers() {
     timer = Timer.periodic(const Duration(seconds: 1), (activeTimer) {
       if (remainingSeconds <= 0) {
         activeTimer.cancel();
         return;
       }
-
-      setState(() {
-        remainingSeconds--;
-      });
+      if (mounted) {
+        setState(() {
+          remainingSeconds--;
+        });
+      }
     });
+
+    // Fetch status every 5 seconds and sync time
+    statusTimer = Timer.periodic(const Duration(seconds: 5), (_) => _fetchStatus());
+  }
+
+  Future<void> _fetchStatus() async {
+    try {
+      final statusResponse = await AuthService().getGameStatus(widget.joinCode!);
+      final statusData = statusResponse.data;
+      
+      final gameResponse = await AuthService().getGameDetails(widget.joinCode!);
+      final gameData = gameResponse.data;
+
+      if (mounted) {
+        setState(() {
+          tilesDone = statusData['tiles_done'];
+          activePlayers = statusData['active_players'];
+          maxCap = statusData['max_cap'].toString();
+          
+          if (gameData['end_time'] != null) {
+            final endTime = DateTime.parse(gameData['end_time']).toUtc();
+            final now = DateTime.now().toUtc();
+            remainingSeconds = endTime.difference(now).inSeconds;
+            if (remainingSeconds < 0) remainingSeconds = 0;
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint("Error fetching status: $e");
+    }
   }
 
   @override
   void dispose() {
     timer?.cancel();
+    statusTimer?.cancel();
     super.dispose();
   }
 
@@ -368,7 +412,7 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
               _badge(context, 'LIVE', colorScheme.onPrimary),
               _badge(
                 context,
-                'PARTICIPANTS ${widget.maxParticipants}',
+                'PARTICIPANTS $activePlayers',
                 colorScheme.onPrimary,
               ),
             ],
@@ -406,7 +450,7 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const LeaderboardScreen(),
+                  builder: (context) => LeaderboardScreen(joinCode: widget.joinCode),
                 ),
               );
             },
@@ -525,7 +569,7 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
                           child: _statCard(
                             context: context,
                             label: 'TILES DONE',
-                            value: '142',
+                            value: '$tilesDone',
                             helper: 'Marked successfully',
                             icon: Icons.grid_view_rounded,
                             accent: colorScheme.primary,
@@ -536,7 +580,7 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
                           child: _statCard(
                             context: context,
                             label: 'ACTIVE',
-                            value: '32',
+                            value: '$activePlayers',
                             helper: 'Players online right now',
                             icon: Icons.people_alt_rounded,
                             accent: Colors.teal,
@@ -547,7 +591,7 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
                           child: _statCard(
                             context: context,
                             label: 'MAX CAP',
-                            value: widget.maxParticipants,
+                            value: maxCap,
                             helper: 'Player limit',
                             icon: Icons.how_to_reg_rounded,
                             accent: Colors.deepOrange,

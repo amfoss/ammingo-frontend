@@ -71,20 +71,34 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       if (!mounted) return;
       final startTime = DateTime.parse(game["start_time"]);
       final endTime = DateTime.parse(game["end_time"]);
-      final String qrImage = game["qr_img"];
+      final String qrImage = game["qr_img"] ?? "";
       final duration = endTime.difference(startTime).inMinutes;
+      
+      String rawDesc = game["description"] ?? "";
+      String eventName = "SOCIAL BINGO";
+      String description = "";
+      if (rawDesc.contains('|')) {
+        var parts = rawDesc.split('|');
+        eventName = parts[0];
+        description = parts[1];
+      } else {
+        eventName = rawDesc.isNotEmpty ? rawDesc : "SOCIAL BINGO";
+      }
+
+      final String hostName = game["host_name"] ?? "Unknown Host";
+      
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => EventDetails(
-            qrImage: "",
-            joinCode: "",
-            eventName: "Event Name", //to be added
-            hostName: "Host", //to be added
-            hostPfp: "https://i.pravatar.cc/150?img=6",
+            qrImage: qrImage,
+            joinCode: code,
+            eventName: eventName, 
+            hostName: hostName,
+            hostPfp: game["host_pfp"] ?? "https://i.pravatar.cc/150?img=6",
             joinOrStart: "PLAY",
             duration: duration,
-            description: game["description"] ?? "",
+            description: description,
             participantCount: lobbyResponse.data["player_count"],
           ),
         ),
