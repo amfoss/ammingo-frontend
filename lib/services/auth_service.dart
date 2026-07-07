@@ -98,4 +98,25 @@ class AuthService {
       },
     );
   }
+  Future<Response> startGame({
+    required String code,
+    required int size,
+  }) async {
+    final token = await _storage.read(key: "access_token");
+    _dio.options.headers["Cookie"] = "access_token=$token";
+
+    try {
+      return await _dio.post(
+        "/games/$code/start",
+        data: {
+          "size": size,
+        },
+      );
+    } on DioException catch (e) {
+      print("STATUS: ${e.response?.statusCode}");
+      print("BODY: ${e.response?.data}");
+      print("URI: ${e.requestOptions.uri}");
+      rethrow;
+    }
+  }
 }

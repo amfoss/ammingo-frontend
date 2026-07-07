@@ -157,14 +157,14 @@ class _BingoBoardState extends State<BingoBoard> {
                       MaterialPageRoute(
                         builder: (context) => EventDetails(
                           qrImage: "",
-                          joinCode: "",
+                          joinCode: widget.joinCode,
                           eventName: widget.eventName,
                           hostName: widget.hostName,
                           hostPfp: 'https://i.pravatar.cc/150?img=6',
                           joinOrStart: 'PLAY',
                           duration: widget.timelimit,
                           description: widget.description,
-                        ),
+                        )
                       ),
                     );
                   },

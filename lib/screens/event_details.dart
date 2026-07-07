@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'bingo_board.dart';
 import 'game_monitor.dart';
 import 'dart:convert';
-
+import 'dart:async';
+import '../services/auth_service.dart';
 class EventDetails extends StatefulWidget {
   final String eventName;
   final String hostName;
@@ -37,14 +38,79 @@ class EventDetails extends StatefulWidget {
 
 class _EventDetailsState extends State<EventDetails> {
   late String _selectedGridSize;
+  Timer? _gameTimer;
+  Timer? _lobbyTimer;
+  int _participantCount = 0;
+  void _startPolling() {
+    final auth = AuthService();
 
+    _gameTimer = Timer.periodic(
+      const Duration(seconds: 3),
+          (_) async {
+        try {
+          final response = await auth.getGameDetails(widget.joinCode);
+
+          if (response.data["board_size"] != null) {
+            _gameTimer?.cancel();
+
+            if (!mounted) return;
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => BingoBoard(
+                  joinCode: widget.joinCode,
+                  eventName: widget.eventName,
+                  hostName: widget.hostName,
+                  timelimit: widget.duration,
+                  description: widget.description,
+                ),
+              ),
+            );
+          }
+        } catch (_) {}
+      },
+    );
+  }
   @override
   void initState() {
-    super.initState();
-    _selectedGridSize = widget.initialGridSize;
-    print(widget.qrImage);
-  }
 
+    super.initState();
+
+    _selectedGridSize = widget.initialGridSize;
+    _participantCount = widget.participantCount;
+    if (widget.joinOrStart == "PLAY") {
+      _startPolling();
+    } else if (widget.joinOrStart == "START") {
+      _startLobbyPolling();
+    }
+  }
+  @override
+  void dispose() {
+    _gameTimer?.cancel();
+    _lobbyTimer?.cancel();
+    super.dispose();
+  }
+  void _startLobbyPolling() {
+    final auth = AuthService();
+
+    _lobbyTimer = Timer.periodic(
+      const Duration(seconds: 3),
+          (_) async {
+        try {
+          final response = await auth.getLobby(widget.joinCode);
+
+          if (!mounted) return;
+
+          setState(() {
+            _participantCount = response.data["player_count"];
+          });
+        } catch (e) {
+          debugPrint(e.toString());
+        }
+      },
+    );
+  }
   @override
   void didUpdateWidget(covariant EventDetails oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -376,7 +442,7 @@ class _EventDetailsState extends State<EventDetails> {
                         ),
                       ),
                       Text(
-                        "${widget.participantCount}",
+                        "$_participantCount",
                         style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.primary,
@@ -392,13 +458,25 @@ class _EventDetailsState extends State<EventDetails> {
                 height: height * 0.07,
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (widget.joinOrStart == 'PLAY' ||
-                        widget.joinOrStart == 'RESUME') {
+                  onPressed: widget.joinOrStart == "PLAY"
+                      ? null
+                      : () async {
+                    // Participant waits until host starts
+                    if (widget.joinOrStart == 'PLAY') {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Waiting for host to start the game..."),
+                        ),
+                      );
+                      return;
+                    }
+
+                    // Resume game
+                    if (widget.joinOrStart == 'RESUME') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => BingoBoard(
+                          builder: (_) => BingoBoard(
                             joinCode: widget.joinCode,
                             eventName: widget.eventName,
                             hostName: widget.hostName,
@@ -407,17 +485,43 @@ class _EventDetailsState extends State<EventDetails> {
                           ),
                         ),
                       );
-                    } else if (widget.joinOrStart == 'START') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GameMonitorScreen(
-                            eventName: widget.eventName,
-                            time: widget.duration,
-                            maxParticipants: '60',
+                      return;
+                    }
+
+                    // Host starts game
+                    if (widget.joinOrStart == 'START') {
+                      final auth = AuthService();
+
+                      try {
+                        final boardSize = int.parse(
+                          _selectedGridSize.split('x')[0].trim(),
+                        );
+                        final lobby = await auth.getLobby(widget.joinCode);
+                        print("Lobby: ${lobby.data}");
+                        await auth.startGame(
+                          code: widget.joinCode,
+                          size: boardSize,
+                        );
+
+                        if (!mounted) return;
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => BingoBoard(
+                              joinCode: widget.joinCode,
+                              eventName: widget.eventName,
+                              hostName: widget.hostName,
+                              timelimit: widget.duration,
+                              description: widget.description,
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(e.toString())),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -427,7 +531,9 @@ class _EventDetailsState extends State<EventDetails> {
                     ),
                   ),
                   child: Text(
-                    widget.joinOrStart,
+                    widget.joinOrStart == "PLAY"
+                        ? "WAITING..."
+                        : widget.joinOrStart,
                     style: textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: colorScheme.surface,
