@@ -225,15 +225,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   height: height * 0.07,
                   child: ElevatedButton(
                     onPressed: () async {
-                      final response = await _authService.createGame(
-                        description: _descriptionController.text,
-                        location: _locationController.text,
-                        duration: int.parse(_timeLimitController.text),
-                      );
-
-                      final joinCode = response.data["join_code"];
-                      final gameId = response.data["game_id"];
-                      final qrImage = response.data["qr_img"];
                       if (_eventNameController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -252,12 +243,16 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         return;
                       }
                       try {
-                        await _authService.createGame(
+                        final response = await _authService.createGame(
                           description: _descriptionController.text,
                           location: _locationController.text,
                           duration: int.parse(_timeLimitController.text),
                         );
-                        if (!mounted) return;
+
+                        final joinCode = response.data["join_code"];
+                        final qrImage = response.data["qr_img"];
+
+                        if (!context.mounted) return;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -274,7 +269,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           ),
                         );
                       } catch (e) {
-                        if (!mounted) return;
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("Failed to create event: $e")),
                         );

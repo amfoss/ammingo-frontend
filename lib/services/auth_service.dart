@@ -3,7 +3,7 @@ import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
+import 'package:flutter/foundation.dart';
 
 class AuthService {
   static const _storage = FlutterSecureStorage();
@@ -11,9 +11,7 @@ class AuthService {
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: "http://127.0.0.1:8000/api",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: {"Content-Type": "application/json"},
     ),
   );
   AuthService() {
@@ -34,16 +32,10 @@ class AuthService {
     await sendOtp(email);
   }
 
-  Future<Response> verifyOtp(
-      String email,
-      String otp,
-      ) async {
+  Future<Response> verifyOtp(String email, String otp) async {
     return await _dio.post(
       "/login/verify-otp",
-      data: {
-        "email": email,
-        "otp": otp,
-      },
+      data: {"email": email, "otp": otp},
     );
   }
 
@@ -65,9 +57,7 @@ class AuthService {
     final result = await FlutterWebAuth2.authenticate(
       url: "http://localhost:8000/api/login/oauth",
       callbackUrlScheme: "amingo",
-      options: const FlutterWebAuth2Options(
-        preferEphemeral: false,
-      ),
+      options: const FlutterWebAuth2Options(preferEphemeral: false),
     );
     return Uri.parse(result).queryParameters["token"];
   }
@@ -83,11 +73,11 @@ class AuthService {
   }) async {
     final token = await _storage.read(key: "access_token");
 
-    print("Token: $token");
+    debugPrint("Token: $token");
 
     _dio.options.headers["Cookie"] = "access_token=$token";
 
-    print(_dio.options.headers);
+    debugPrint(_dio.options.headers.toString());
 
     return await _dio.post(
       "/games",
@@ -98,24 +88,17 @@ class AuthService {
       },
     );
   }
-  Future<Response> startGame({
-    required String code,
-    required int size,
-  }) async {
+
+  Future<Response> startGame({required String code, required int size}) async {
     final token = await _storage.read(key: "access_token");
     _dio.options.headers["Cookie"] = "access_token=$token";
 
     try {
-      return await _dio.post(
-        "/games/$code/start",
-        data: {
-          "size": size,
-        },
-      );
+      return await _dio.post("/games/$code/start", data: {"size": size});
     } on DioException catch (e) {
-      print("STATUS: ${e.response?.statusCode}");
-      print("BODY: ${e.response?.data}");
-      print("URI: ${e.requestOptions.uri}");
+      debugPrint("STATUS: ${e.response?.statusCode}");
+      debugPrint("BODY: ${e.response?.data}");
+      debugPrint("URI: ${e.requestOptions.uri}");
       rethrow;
     }
   }

@@ -164,7 +164,7 @@ class _BingoBoardState extends State<BingoBoard> {
                           joinOrStart: 'PLAY',
                           duration: widget.timelimit,
                           description: widget.description,
-                        )
+                        ),
                       ),
                     );
                   },

@@ -307,7 +307,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () async {
                     final token = await AuthService().signInWithGoogle();
                     if (token != null) {
-                      print("Got token: $token");
+                      debugPrint("Got token: $token");
                       if (!context.mounted) return;
                       Navigator.push(
                         context,

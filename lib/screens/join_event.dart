@@ -77,7 +77,7 @@ class _JoinEventScreenState extends State<JoinEventScreen>
         context,
         MaterialPageRoute(
           builder: (_) => EventDetails(
-            qrImage: "",
+            qrImage: qrImage,
             joinCode: code,
             eventName: "Event Name",
             hostName: "Host",
@@ -86,7 +86,7 @@ class _JoinEventScreenState extends State<JoinEventScreen>
             duration: duration,
             description: game["description"] ?? "",
             participantCount: lobbyResponse.data["player_count"],
-          )
+          ),
         ),
       );
     } on DioException catch (e) {
@@ -239,7 +239,7 @@ class _JoinEventScreenState extends State<JoinEventScreen>
                                     setState(() {
                                       qrResult = barcodes.first.rawValue!;
                                     });
-                                    print("QR Result: $qrResult");
+                                    debugPrint("QR Result: $qrResult");
                                     final uri = Uri.tryParse(qrResult);
 
                                     if (uri != null) {
