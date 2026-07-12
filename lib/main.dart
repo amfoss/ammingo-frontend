@@ -195,6 +195,7 @@ class _EmailInputState extends State<HomeScreen> {
                             );
                           } catch (e) {
                             debugPrint(e.toString());
+
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(e.toString())),

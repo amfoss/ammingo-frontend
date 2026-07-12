@@ -68,23 +68,42 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       final lobbyResponse = await auth.getLobby(code);
       final gameResponse = await auth.getGameDetails(code);
       final game = gameResponse.data;
+      debugPrint("Current game details:");
+      debugPrint(game.toString());
+
+      debugPrint("Host name from API: ${game["host_name"]}");
+      debugPrint("Host id from API: ${game["host_id"]}");
       if (!mounted) return;
       final startTime = DateTime.parse(game["start_time"]);
       final endTime = DateTime.parse(game["end_time"]);
-      final String qrImage = game["qr_img"];
+      final String qrImage = game["qr_img"] ?? "";
       final duration = endTime.difference(startTime).inMinutes;
+
+      String rawDesc = game["description"] ?? "";
+      String eventName = "SOCIAL BINGO";
+      String description = "";
+      if (rawDesc.contains('|')) {
+        var parts = rawDesc.split('|');
+        eventName = parts[0].trim();
+        description = parts[1].trim();
+      } else {
+        eventName = rawDesc.isNotEmpty ? rawDesc : "SOCIAL BINGO";
+      }
+
+      final String hostName = game["host_name"] ?? "Unknown Host";
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => EventDetails(
             qrImage: qrImage,
             joinCode: code,
-            eventName: "Event Name",
-            hostName: "Host",
-            hostPfp: "https://i.pravatar.cc/150?img=6",
+            eventName: eventName,
+            hostName: hostName,
+            hostPfp: game["host_pfp"] ?? "https://i.pravatar.cc/150?img=6",
             joinOrStart: "PLAY",
             duration: duration,
-            description: game["description"] ?? "",
+            description: description,
             participantCount: lobbyResponse.data["player_count"],
           ),
         ),

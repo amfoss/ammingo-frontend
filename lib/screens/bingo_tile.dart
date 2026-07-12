@@ -22,7 +22,7 @@ class BingoTile extends StatelessWidget {
         : colorScheme.onSurface;
 
     return GestureDetector(
-      onTap: isMarked ? null : onTap, // disable if already marked
+      onTap: isMarked ? null : onTap,
       child: Container(
         decoration: BoxDecoration(
           color: tileColor,
@@ -69,13 +69,22 @@ class BingoTile extends StatelessWidget {
 class BingoCell {
   final String letter;
   final bool isMarked;
+  final int row;
+  final int col;
 
-  const BingoCell({required this.letter, this.isMarked = false});
+  const BingoCell({
+    required this.letter,
+    this.isMarked = false,
+    required this.row,
+    required this.col,
+  });
 
-  BingoCell copyWith({String? letter, bool? isMarked}) {
+  BingoCell copyWith({String? letter, bool? isMarked, int? row, int? col}) {
     return BingoCell(
       letter: letter ?? this.letter,
       isMarked: isMarked ?? this.isMarked,
+      row: row ?? this.row,
+      col: col ?? this.col,
     );
   }
 }

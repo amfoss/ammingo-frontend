@@ -1,5 +1,6 @@
 import 'package:amingo/screens/create_event.dart';
 import 'package:amingo/screens/join_event.dart';
+import 'package:amingo/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class Roleselection extends StatelessWidget {
@@ -33,6 +34,17 @@ class Roleselection extends StatelessWidget {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+          ),
+        ],
       ),
 
       body: SafeArea(

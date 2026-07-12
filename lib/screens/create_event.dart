@@ -242,15 +242,32 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         );
                         return;
                       }
+
                       try {
+                        // Fetch host profile first
+                        final profileResponse = await _authService.getProfile(
+                          0,
+                        );
+                        final String hostName =
+                            profileResponse.data["name"] ?? "Host";
+                        final String? pfp =
+                            profileResponse.data["profile_image"];
+                        final String hostPfp = (pfp != null && pfp.isNotEmpty)
+                            ? (pfp.startsWith('http')
+                                  ? pfp
+                                  : "${AuthService.baseUrl}${pfp.startsWith('/') ? '' : '/'}$pfp")
+                            : "https://i.pravatar.cc/150?img=6";
+
                         final response = await _authService.createGame(
-                          description: _descriptionController.text,
+                          description:
+                              "${_eventNameController.text}|${_descriptionController.text}",
                           location: _locationController.text,
                           duration: int.parse(_timeLimitController.text),
                         );
 
-                        final joinCode = response.data["join_code"];
-                        final qrImage = response.data["qr_img"];
+                        final String joinCode =
+                            response.data["join_code"] ?? "";
+                        final String qrImage = response.data["qr_img"] ?? "";
 
                         if (!context.mounted) return;
                         Navigator.push(
@@ -258,8 +275,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           MaterialPageRoute(
                             builder: (context) => EventDetails(
                               eventName: _eventNameController.text,
-                              hostName: "amFOSS",
-                              hostPfp: "https://i.pravatar.cc/150?img=6",
+                              hostName: hostName,
+                              hostPfp: hostPfp,
                               joinOrStart: "START",
                               duration: int.parse(_timeLimitController.text),
                               description: _descriptionController.text,
