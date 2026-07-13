@@ -336,14 +336,29 @@ class _FriendVerificationState extends State<FriendVerification> {
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              "Check profile to see your code.",
-              style: textTheme.bodySmall?.copyWith(
-                color: colorScheme.tertiary,
-                fontWeight: FontWeight.bold,
+            const SizedBox(height: 8),
+            if (myCode != "...")
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    "YOUR CODE: $myCode",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                ),
               ),
-            ),
 
             const SizedBox(height: 24),
 
