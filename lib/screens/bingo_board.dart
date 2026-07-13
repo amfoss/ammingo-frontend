@@ -4,6 +4,7 @@ import 'package:amingo/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'bingo_tile.dart';
 import 'friend_verification.dart';
+import 'role_selection.dart';
 import 'package:amingo/screens/leaderboard_screen.dart';
 
 class BingoBoard extends StatefulWidget {
@@ -172,15 +173,52 @@ class _BingoBoardState extends State<BingoBoard> {
     return "${min.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}";
   }
 
+  Future<bool> _showExitConfirmationDialog() async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Exit Game?"),
+        content: const Text("you cannot rejoin the game if you leave, are you sure."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            child: const Text("Yes"),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final shouldPop = await _showExitConfirmationDialog();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const Roleselection()),
+            (route) => false,
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: colorScheme.surface,
+        appBar: AppBar(
         backgroundColor: colorScheme.surface,
         centerTitle: true,
         title: Row(
@@ -226,7 +264,7 @@ class _BingoBoardState extends State<BingoBoard> {
         ),
       ),
       bottomNavigationBar: _buildBottomNav(colorScheme, textTheme),
-    );
+    ));
   }
 
   Widget _buildScoreBadge(ColorScheme cs) {

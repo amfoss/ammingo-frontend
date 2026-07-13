@@ -13,10 +13,12 @@ class Roleselection extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: colorScheme.surface,
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
         centerTitle: true,
         backgroundColor: colorScheme.surface,
         title: Row(
@@ -118,7 +120,7 @@ class Roleselection extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 
