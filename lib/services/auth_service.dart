@@ -19,7 +19,7 @@ class AuthService {
     _dio.interceptors.add(CookieManager(_cookieJar));
   }
 
-  static const String baseUrl = "http://localhost:8000";
+  static const String baseUrl = "https://amingoapi.amfoss.in";
 
   Future<void> sendOtp(String email) async {
     await _dio.post("/login/email", data: {"email": email});
