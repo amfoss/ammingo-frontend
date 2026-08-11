@@ -16,7 +16,7 @@ class Roleselection extends StatelessWidget {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
-        automaticallyImplyLeading: true,
+        automaticallyImplyLeading: false,
         centerTitle: true,
         backgroundColor: colorScheme.surface,
         title: Row(
@@ -196,3 +196,4 @@ class RoleCard extends StatelessWidget {
     );
   }
 }
+

@@ -96,9 +96,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const CreateUsername()),
+        (route) => false,
       );
     } on DioException catch (e) {
       final message = e.response?.data["detail"] ?? "Something went wrong";
@@ -339,11 +340,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       }
 
                       if (!context.mounted) return;
-                      Navigator.push(
+                      Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const CreateUsername(),
                         ),
+                        (route) => false,
                       );
                     }
                   },

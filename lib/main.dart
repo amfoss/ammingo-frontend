@@ -261,11 +261,12 @@ class _EmailInputState extends State<HomeScreen> {
                           await AuthService.saveToken(token);
                           debugPrint("Got token: $token");
                           if (!context.mounted) return;
-                          Navigator.push(
+                          Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const CreateUsername(),
                             ),
+                            (route) => false,
                           );
                         }
                       },

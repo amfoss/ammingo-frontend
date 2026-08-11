@@ -34,9 +34,10 @@ class _CreateUsernameState extends State<CreateUsername> {
     try {
       await AuthService().updateProfile(name: name);
       if (mounted) {
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const Roleselection()),
+          (route) => false,
         );
       }
     } catch (e) {
@@ -57,7 +58,9 @@ class _CreateUsernameState extends State<CreateUsername> {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
       backgroundColor: colorScheme.surface,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
@@ -186,6 +189,7 @@ class _CreateUsernameState extends State<CreateUsername> {
           ),
         ),
       ),
-    );
+    ),
+  );
   }
 }
