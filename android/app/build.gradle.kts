@@ -17,7 +17,8 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "org.amfoss.ammingo"
 
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
+    buildToolsVersion = "36.0.0"
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -41,8 +42,8 @@ android {
     defaultConfig {
         applicationId = "org.amfoss.ammingo"
 
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 24
+        targetSdk = 35
 
         versionCode = flutter.versionCode
         versionName = flutter.versionName

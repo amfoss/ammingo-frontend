@@ -40,13 +40,11 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
 
   void _startTimers() {
     timer = Timer.periodic(const Duration(seconds: 1), (activeTimer) {
-      if (remainingSeconds <= 0) {
-        activeTimer.cancel();
-        return;
-      }
       if (mounted) {
         setState(() {
-          remainingSeconds--;
+          if (remainingSeconds > 0) {
+            remainingSeconds--;
+          }
         });
       }
     });
@@ -68,12 +66,16 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
 
       if (mounted) {
         setState(() {
-          tilesDone = statusData['tiles_done'];
-          activePlayers = statusData['active_players'];
-          maxCap = statusData['max_cap'].toString();
+          tilesDone = statusData['tiles_done'] ?? 0;
+          activePlayers = statusData['active_players'] ?? 0;
+          maxCap = statusData['max_cap']?.toString() ?? '0';
 
           if (gameData['end_time'] != null) {
-            final endTime = DateTime.parse(gameData['end_time']).toUtc();
+            String endTimeStr = gameData['end_time'];
+            if (!endTimeStr.endsWith('Z') && !endTimeStr.contains('+')) {
+              endTimeStr = "${endTimeStr}Z";
+            }
+            final endTime = DateTime.parse(endTimeStr).toUtc();
             final now = DateTime.now().toUtc();
             remainingSeconds = endTime.difference(now).inSeconds;
             if (remainingSeconds < 0) remainingSeconds = 0;

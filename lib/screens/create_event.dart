@@ -233,11 +233,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         );
                         return;
                       }
-                      if (_timeLimitController.text.isEmpty ||
-                          _participantsController.text.isEmpty) {
+                      final duration = int.tryParse(_timeLimitController.text.trim());
+                      if (duration == null || duration <= 0) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("Please fill in all required fields"),
+                            content: Text("Please enter a valid positive duration in minutes"),
                           ),
                         );
                         return;
@@ -262,7 +262,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           description:
                               "${_eventNameController.text}|${_descriptionController.text}",
                           location: _locationController.text,
-                          duration: int.parse(_timeLimitController.text),
+                          duration: duration,
                         );
 
                         final String joinCode =
@@ -278,7 +278,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                               hostName: hostName,
                               hostPfp: hostPfp,
                               joinOrStart: "START",
-                              duration: int.parse(_timeLimitController.text),
+                              duration: duration,
                               description: _descriptionController.text,
                               joinCode: joinCode,
                               qrImage: qrImage,

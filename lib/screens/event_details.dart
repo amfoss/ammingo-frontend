@@ -264,7 +264,10 @@ class _EventDetailsState extends State<EventDetails> {
               ),
               child: CircleAvatar(
                 radius: 22,
-                backgroundImage: NetworkImage(_currentHostPfp),
+                backgroundImage: _currentHostPfp.isNotEmpty
+                    ? NetworkImage(_currentHostPfp)
+                    : const AssetImage('assets/images/default2.png')
+                        as ImageProvider,
                 backgroundColor: cs.surfaceContainer,
                 onBackgroundImageError: (exception, stackTrace) {},
                 child: _currentHostPfp.isEmpty

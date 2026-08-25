@@ -49,29 +49,12 @@ class _BingoBoardState extends State<BingoBoard> {
 
   void _startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (endTime != null) {
-        final now = DateTime.now().toUtc();
-        final diff = endTime!.difference(now).inSeconds;
-        if (mounted) {
-          setState(() {
-            timeLeft = diff > 0 ? diff : 0;
-          });
-        }
-        if (diff <= 0) {
-          t.cancel();
-          _showTimeUp();
-        }
-      } else {
-        if (timeLeft <= 0) {
-          t.cancel();
-          _showTimeUp();
-          return;
-        }
-        if (mounted) {
-          setState(() {
+      if (mounted) {
+        setState(() {
+          if (timeLeft > 0) {
             timeLeft--;
-          });
-        }
+          }
+        });
       }
     });
   }
@@ -118,7 +101,14 @@ class _BingoBoardState extends State<BingoBoard> {
           }).toList();
 
           if (gameData['end_time'] != null) {
-            endTime = DateTime.parse(gameData['end_time']).toUtc();
+            String endTimeStr = gameData['end_time'];
+            if (!endTimeStr.endsWith('Z') && !endTimeStr.contains('+')) {
+              endTimeStr = "${endTimeStr}Z";
+            }
+            endTime = DateTime.parse(endTimeStr).toUtc();
+            final now = DateTime.now().toUtc();
+            final diff = endTime!.difference(now).inSeconds;
+            timeLeft = diff > 0 ? diff : 0;
           }
 
           checkedTiles = board.where((c) => c.isMarked).length;

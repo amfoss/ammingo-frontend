@@ -68,14 +68,20 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       final lobbyResponse = await auth.getLobby(code);
       final gameResponse = await auth.getGameDetails(code);
       final game = gameResponse.data;
-      debugPrint("Current game details:");
-      debugPrint(game.toString());
-
-      debugPrint("Host name from API: ${game["host_name"]}");
-      debugPrint("Host id from API: ${game["host_id"]}");
       if (!mounted) return;
-      final startTime = DateTime.parse(game["start_time"]);
-      final endTime = DateTime.parse(game["end_time"]);
+      
+      String startTimeStr = game["start_time"] ?? "";
+      String endTimeStr = game["end_time"] ?? "";
+      
+      if (startTimeStr.isNotEmpty && !startTimeStr.endsWith('Z') && !startTimeStr.contains('+')) {
+        startTimeStr = "${startTimeStr}Z";
+      }
+      if (endTimeStr.isNotEmpty && !endTimeStr.endsWith('Z') && !endTimeStr.contains('+')) {
+        endTimeStr = "${endTimeStr}Z";
+      }
+
+      final startTime = DateTime.parse(startTimeStr).toUtc();
+      final endTime = DateTime.parse(endTimeStr).toUtc();
       final String qrImage = game["qr_img"] ?? "";
       final duration = endTime.difference(startTime).inMinutes;
 

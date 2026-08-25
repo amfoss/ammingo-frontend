@@ -89,9 +89,14 @@ class _LoginScreenState extends State<LoginScreen> {
         otpController.text.trim(),
       );
 
-      // Save user code if present in response
-      if (response.data != null && response.data["code"] != null) {
-        await AuthService.saveUserCode(response.data["code"].toString());
+      // Save user code and token if present in response
+      if (response.data != null) {
+        if (response.data["code"] != null) {
+          await AuthService.saveUserCode(response.data["code"].toString());
+        }
+        if (response.data["access_token"] != null) {
+          await AuthService.saveToken(response.data["access_token"].toString());
+        }
       }
 
       if (!mounted) return;
@@ -321,7 +326,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     // to update AuthService to return a Map or similar to get both.
                     // For now, we fetch the profile after login to ensure we have the code.
                     if (result != null) {
-                      debugPrint("Got token: $result");
                       await AuthService.saveToken(result);
 
                       // Fetch profile to get the code

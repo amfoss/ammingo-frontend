@@ -131,9 +131,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         backgroundColor: colorScheme.primary.withValues(
                           alpha: 0.1,
                         ),
-                        backgroundImage: profileImageUrl != null
+                        backgroundImage: profileImageUrl != null && profileImageUrl!.isNotEmpty
                             ? NetworkImage(
-                                "${AuthService.baseUrl}$profileImageUrl",
+                                profileImageUrl!.startsWith('http')
+                                    ? profileImageUrl!
+                                    : "${AuthService.baseUrl}$profileImageUrl",
                               )
                             : const AssetImage('assets/images/default2.png')
                                   as ImageProvider,
