@@ -108,7 +108,7 @@ class _FriendVerificationState extends State<FriendVerification> {
         row: widget.row,
         col: widget.col,
         friendName: nameController.text.trim(),
-        friendCode: codeController.text.trim(),
+        friendCode: codeController.text.trim().toUpperCase(),
         fact: aboutController.text.trim(),
         image: image!,
       );

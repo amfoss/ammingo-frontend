@@ -39,7 +39,7 @@ class _JoinEventScreenState extends State<JoinEventScreen>
   }
 
   Future<void> _handleJoinEvent() async {
-    final code = _codeController.text.trim();
+    final code = _codeController.text.trim().toUpperCase();
 
     if (code.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -97,6 +97,12 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       }
 
       final String hostName = game["host_name"] ?? "Unknown Host";
+      final String rawPfp = game["host_pfp"] ?? "";
+      final String hostPfp = (rawPfp.isNotEmpty)
+          ? (rawPfp.startsWith('http')
+              ? rawPfp
+              : "${AuthService.baseUrl}${rawPfp.startsWith('/') ? '' : '/'}$rawPfp")
+          : "https://i.pravatar.cc/150?img=6";
 
       Navigator.pushReplacement(
         context,
@@ -106,7 +112,7 @@ class _JoinEventScreenState extends State<JoinEventScreen>
             joinCode: code,
             eventName: eventName,
             hostName: hostName,
-            hostPfp: game["host_pfp"] ?? "https://i.pravatar.cc/150?img=6",
+            hostPfp: hostPfp,
             joinOrStart: "PLAY",
             duration: duration,
             description: description,
