@@ -28,6 +28,8 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
   int tilesDone = 0;
   int activePlayers = 0;
   String maxCap = '0';
+  List<dynamic> topPlayers = [];
+  bool isLoadingLeaderboard = true;
 
   @override
   void initState() {
@@ -64,11 +66,18 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
       final gameResponse = await AuthService().getGameDetails(widget.joinCode);
       final gameData = gameResponse.data;
 
+      final leaderboardResponse =
+          await AuthService().getLeaderboard(widget.joinCode);
+      final leaderboardData = leaderboardResponse.data['leaderboard'] ?? [];
+
       if (mounted) {
         setState(() {
           tilesDone = statusData['tiles_done'] ?? 0;
           activePlayers = statusData['active_players'] ?? 0;
           maxCap = statusData['max_cap']?.toString() ?? '0';
+
+          topPlayers = leaderboardData;
+          isLoadingLeaderboard = false;
 
           if (gameData['end_time'] != null) {
             String endTimeStr = gameData['end_time'];
@@ -255,76 +264,75 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
     );
   }
 
-  Widget _activityCard({
+  Widget _rankingCard({
     required BuildContext context,
-    required String title,
-    required String subtitle,
-    required String timeLabel,
-    required Color accent,
+    required int rank,
+    required String name,
+    required int points,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isTop = rank <= 3;
+    final rankColor = rank == 1
+        ? Colors.yellow.shade700
+        : rank == 2
+        ? Colors.grey.shade400
+        : rank == 3
+        ? Colors.orange.shade400
+        : colorScheme.onSurfaceVariant;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.6),
+          color: isTop
+              ? rankColor.withValues(alpha: 0.4)
+              : colorScheme.outlineVariant.withValues(alpha: 0.6),
+          width: isTop ? 2 : 1,
         ),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 42,
-            height: 42,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.12),
+              color: rankColor.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.circle, color: accent, size: 12),
+            child: Center(
+              child: Text(
+                '$rank',
+                style: TextStyle(
+                  color: rankColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      timeLabel,
-                      style: TextStyle(
-                        color: colorScheme.onSurfaceVariant,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: colorScheme.onSurfaceVariant,
-                    fontSize: 12,
-                    height: 1.35,
-                  ),
-                ),
-              ],
+            child: Text(
+              name,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: colorScheme.primaryContainer.withValues(alpha: 0.4),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              '$points pts',
+              style: TextStyle(
+                color: colorScheme.primary,
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
             ),
           ),
         ],
@@ -432,7 +440,34 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final bool? shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Exit Monitor?'),
+            content: const Text(
+              'Are you sure you want to go back? The game will continue running in the background.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('CANCEL'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('EXIT'),
+              ),
+            ],
+          ),
+        );
+        if (shouldPop == true && context.mounted) {
+          Navigator.pop(context);
+        }
+      },
+      child: Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: AppBar(
         centerTitle: true,
@@ -613,58 +648,72 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
                   children: [
                     _sectionTitle(
                       context,
-                      'Live Activity Feed',
-                      'Latest updates from the board',
+                      'Live Leaderboard',
+                      'Current player rankings',
                     ),
-                    Text(
-                      'JUST NOW',
-                      style: TextStyle(
-                        color: colorScheme.onSurfaceVariant,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1,
+                    if (topPlayers.isNotEmpty)
+                      Text(
+                        '${topPlayers.length} PLAYERS',
+                        style: TextStyle(
+                          color: colorScheme.primary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 14),
-                _activityCard(
-                  context: context,
-                  title: 'Player activity update',
-                  subtitle:
-                      'A new player just completed a tile and the board is updating in real time.',
-                  timeLabel: 'NOW',
-                  accent: colorScheme.primary,
-                ),
-                _activityCard(
-                  context: context,
-                  title: 'Leaderboard reshuffle',
-                  subtitle:
-                      'One player crossed into the top three after a fresh tile verification.',
-                  timeLabel: '2M',
-                  accent: Colors.teal,
-                ),
-                _activityCard(
-                  context: context,
-                  title: 'Event pulse check',
-                  subtitle:
-                      'Attendance is stable and the game monitor is tracking live participants.',
-                  timeLabel: '5M',
-                  accent: Colors.deepOrange,
-                ),
-                _activityCard(
-                  context: context,
-                  title: 'Match activity synced',
-                  subtitle:
-                      'Recent bingo updates were pushed to the monitor successfully.',
-                  timeLabel: '8M',
-                  accent: Colors.indigo,
-                ),
+                if (isLoadingLeaderboard)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                else if (topPlayers.isEmpty)
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(32),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.group_off_rounded,
+                            size: 48,
+                            color: colorScheme.outline,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'No players joined yet',
+                            style: TextStyle(
+                              color: colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  ...topPlayers.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final player = entry.value;
+                    return _rankingCard(
+                      context: context,
+                      rank: index + 1,
+                      name: player['name'] ?? 'Unknown',
+                      points: player['points'] ?? 0,
+                    );
+                  }),
+                const SizedBox(height: 20),
               ],
             ),
           ),
         ),
       ),
-    );
+    ));
   }
 }

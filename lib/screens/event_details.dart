@@ -438,6 +438,13 @@ class _EventDetailsState extends State<EventDetails> {
   }
 
   Widget _buildActionButton(ColorScheme cs, TextTheme tt, Size size) {
+    String buttonText = widget.joinOrStart;
+    if (widget.joinOrStart == 'START' && _gameStarted) {
+      buttonText = 'RESUME MONITOR';
+    } else if (widget.joinOrStart == 'PLAY' && !_gameStarted) {
+      buttonText = 'WAITING FOR HOST';
+    }
+
     return SizedBox(
       height: 56,
       width: double.infinity,
@@ -465,6 +472,22 @@ class _EventDetailsState extends State<EventDetails> {
               ),
             );
           } else if (widget.joinOrStart == 'START') {
+            if (_gameStarted) {
+              // Directly resume monitor if game already started
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GameMonitorScreen(
+                    eventName: widget.eventName,
+                    time: widget.duration,
+                    maxParticipants: '100',
+                    joinCode: widget.joinCode,
+                  ),
+                ),
+              );
+              return;
+            }
+
             try {
               int gridIntSize =
                   int.tryParse(_selectedGridSize.split('x').first.trim()) ?? 5;
@@ -507,9 +530,7 @@ class _EventDetailsState extends State<EventDetails> {
           elevation: 0,
         ),
         child: Text(
-          (widget.joinOrStart == 'PLAY' && !_gameStarted)
-              ? 'WAITING FOR HOST'
-              : widget.joinOrStart,
+          buttonText,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),

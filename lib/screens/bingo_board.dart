@@ -166,8 +166,35 @@ class _BingoBoardState extends State<BingoBoard> {
     final textTheme = Theme.of(context).textTheme;
     final size = MediaQuery.of(context).size;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        final bool? shouldPop = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Leave Game?'),
+            content: const Text(
+              'Are you sure you want to leave the game? You can resume later from the event details.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('CANCEL'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('LEAVE'),
+              ),
+            ],
+          ),
+        );
+        if (shouldPop == true && context.mounted) {
+          Navigator.pop(context);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: colorScheme.surface,
       appBar: AppBar(
         backgroundColor: colorScheme.surface,
         centerTitle: true,
@@ -214,7 +241,7 @@ class _BingoBoardState extends State<BingoBoard> {
         ),
       ),
       bottomNavigationBar: _buildBottomNav(colorScheme, textTheme),
-    );
+    ));
   }
 
   Widget _buildScoreBadge(ColorScheme cs) {
