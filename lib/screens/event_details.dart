@@ -47,6 +47,7 @@ class _EventDetailsState extends State<EventDetails> {
   String _currentDescription = "";
   bool _gameStarted = false;
   Timer? _refreshTimer;
+  List<int> _availableBoardSizes = [3];
 
   @override
   void initState() {
@@ -78,6 +79,10 @@ class _EventDetailsState extends State<EventDetails> {
         setState(() {
           _currentParticipantCount =
               lobbyResponse.data['player_count'] ?? _currentParticipantCount;
+
+          _availableBoardSizes = List<int>.from(
+            lobbyResponse.data['available_board_sizes'] ?? [3],
+          );
 
           final String? hostName = game['host_name'];
           if (hostName != null && hostName.isNotEmpty) {
@@ -491,6 +496,20 @@ class _EventDetailsState extends State<EventDetails> {
             try {
               int gridIntSize =
                   int.tryParse(_selectedGridSize.split('x').first.trim()) ?? 5;
+
+              if (!_availableBoardSizes.contains(gridIntSize)) {
+                String allowedStr = _availableBoardSizes.join(', ');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "Board size ${gridIntSize}x$gridIntSize is not allowed. "
+                      "Based on participants, allowed sizes are: $allowedStr",
+                    ),
+                  ),
+                );
+                return;
+              }
+
               await AuthService().startGame(
                 code: widget.joinCode,
                 size: gridIntSize,

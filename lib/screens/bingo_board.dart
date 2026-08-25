@@ -37,6 +37,7 @@ class _BingoBoardState extends State<BingoBoard> {
   DateTime? endTime;
 
   Timer? timer;
+  Timer? refreshTimer;
 
   @override
   void initState() {
@@ -45,6 +46,13 @@ class _BingoBoardState extends State<BingoBoard> {
     timeLeft = widget.timelimit * 60;
     _fetchBoard();
     _startTimer();
+    _startPolling();
+  }
+
+  void _startPolling() {
+    refreshTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      _fetchBoard();
+    });
   }
 
   void _startTimer() {
@@ -126,6 +134,7 @@ class _BingoBoardState extends State<BingoBoard> {
   @override
   void dispose() {
     timer?.cancel();
+    refreshTimer?.cancel();
     super.dispose();
   }
 
