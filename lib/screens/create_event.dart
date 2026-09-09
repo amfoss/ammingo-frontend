@@ -233,11 +233,15 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         );
                         return;
                       }
-                      final duration = int.tryParse(_timeLimitController.text.trim());
+                      final duration = int.tryParse(
+                        _timeLimitController.text.trim(),
+                      );
                       if (duration == null || duration <= 0) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text("Please enter a valid positive duration in minutes"),
+                            content: Text(
+                              "Please enter a valid positive duration in minutes",
+                            ),
                           ),
                         );
                         return;

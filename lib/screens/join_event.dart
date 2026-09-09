@@ -69,14 +69,18 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       final gameResponse = await auth.getGameDetails(code);
       final game = gameResponse.data;
       if (!mounted) return;
-      
+
       String startTimeStr = game["start_time"] ?? "";
       String endTimeStr = game["end_time"] ?? "";
-      
-      if (startTimeStr.isNotEmpty && !startTimeStr.endsWith('Z') && !startTimeStr.contains('+')) {
+
+      if (startTimeStr.isNotEmpty &&
+          !startTimeStr.endsWith('Z') &&
+          !startTimeStr.contains('+')) {
         startTimeStr = "${startTimeStr}Z";
       }
-      if (endTimeStr.isNotEmpty && !endTimeStr.endsWith('Z') && !endTimeStr.contains('+')) {
+      if (endTimeStr.isNotEmpty &&
+          !endTimeStr.endsWith('Z') &&
+          !endTimeStr.contains('+')) {
         endTimeStr = "${endTimeStr}Z";
       }
 
@@ -100,8 +104,8 @@ class _JoinEventScreenState extends State<JoinEventScreen>
       final String rawPfp = game["host_pfp"] ?? "";
       final String hostPfp = (rawPfp.isNotEmpty)
           ? (rawPfp.startsWith('http')
-              ? rawPfp
-              : "${AuthService.baseUrl}${rawPfp.startsWith('/') ? '' : '/'}$rawPfp")
+                ? rawPfp
+                : "${AuthService.baseUrl}${rawPfp.startsWith('/') ? '' : '/'}$rawPfp")
           : "https://i.pravatar.cc/150?img=6";
 
       Navigator.pushReplacement(

@@ -61,135 +61,135 @@ class _CreateUsernameState extends State<CreateUsername> {
     return PopScope(
       canPop: false,
       child: Scaffold(
-      backgroundColor: colorScheme.surface,
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Switch(
-                      value: Theme.of(context).brightness == Brightness.dark,
-                      onChanged: (value) {
-                        themeProvider.toggleTheme(value);
-                      },
-                    ),
-                  ],
-                ),
-
-                Center(
-                  child: Image.asset(
-                    'assets/images/amMingo.png',
-                    height: height * 0.15,
-                  ),
-                ),
-                SizedBox(height: height * 0.01),
-                Center(
-                  child: Column(
+        backgroundColor: colorScheme.surface,
+        resizeToAvoidBottomInset: true,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        "AMINGO",
-                        style: TextStyle(
-                          color: colorScheme.onSurface,
-                          fontSize: width * 0.2,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                        ),
-                      ),
-                      SizedBox(height: height * 0.01),
-                      Text(
-                        "Create your identity",
-                        style: TextStyle(
-                          color: colorScheme.onSurfaceVariant,
-                          fontSize: width * 0.04,
-                        ),
+                      Switch(
+                        value: Theme.of(context).brightness == Brightness.dark,
+                        onChanged: (value) {
+                          themeProvider.toggleTheme(value);
+                        },
                       ),
                     ],
                   ),
-                ),
 
-                SizedBox(height: height * 0.05),
-
-                Text(
-                  "Display Name",
-                  style: TextStyle(
-                    color: colorScheme.onSurface,
-                    fontWeight: FontWeight.w600,
-                    fontSize: width * 0.04,
-                  ),
-                ),
-
-                SizedBox(height: height * 0.02),
-
-                TextField(
-                  controller: nameController,
-                  keyboardType: TextInputType.name,
-                  cursorColor: colorScheme.primary,
-                  style: TextStyle(color: colorScheme.onSurface),
-                  decoration: InputDecoration(
-                    hintText: "Enter your name",
-                    hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
-                    filled: true,
-                    fillColor: colorScheme.surface,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: colorScheme.outline,
-                        width: 1.2,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: colorScheme.primary,
-                        width: 1.5,
-                      ),
+                  Center(
+                    child: Image.asset(
+                      'assets/images/amMingo.png',
+                      height: height * 0.15,
                     ),
                   ),
-                ),
-                SizedBox(height: height * 0.15),
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    onPressed: isLoading ? null : _saveProfile,
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : Text(
-                            "Save Profile",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: width * 0.05,
-                            ),
+                  SizedBox(height: height * 0.01),
+                  Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          "AMINGO",
+                          style: TextStyle(
+                            color: colorScheme.onSurface,
+                            fontSize: width * 0.2,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.5,
                           ),
+                        ),
+                        SizedBox(height: height * 0.01),
+                        Text(
+                          "Create your identity",
+                          style: TextStyle(
+                            color: colorScheme.onSurfaceVariant,
+                            fontSize: width * 0.04,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-              ],
+
+                  SizedBox(height: height * 0.05),
+
+                  Text(
+                    "Display Name",
+                    style: TextStyle(
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                      fontSize: width * 0.04,
+                    ),
+                  ),
+
+                  SizedBox(height: height * 0.02),
+
+                  TextField(
+                    controller: nameController,
+                    keyboardType: TextInputType.name,
+                    cursorColor: colorScheme.primary,
+                    style: TextStyle(color: colorScheme.onSurface),
+                    decoration: InputDecoration(
+                      hintText: "Enter your name",
+                      hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                      filled: true,
+                      fillColor: colorScheme.surface,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: colorScheme.outline,
+                          width: 1.2,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                          color: colorScheme.primary,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: height * 0.15),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 55,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: isLoading ? null : _saveProfile,
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              "Save Profile",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: width * 0.05,
+                              ),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ),
-  );
+    );
   }
 }
