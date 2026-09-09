@@ -67,7 +67,6 @@ class _BingoBoardState extends State<BingoBoard> {
     });
   }
 
-
   Future<void> _fetchBoard() async {
     try {
       final response = await AuthService().getBoard(widget.joinCode);
