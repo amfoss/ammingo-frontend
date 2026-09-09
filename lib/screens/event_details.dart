@@ -272,7 +272,7 @@ class _EventDetailsState extends State<EventDetails> {
                 backgroundImage: _currentHostPfp.isNotEmpty
                     ? NetworkImage(_currentHostPfp)
                     : const AssetImage('assets/images/default2.png')
-                        as ImageProvider,
+                          as ImageProvider,
                 backgroundColor: cs.surfaceContainer,
                 onBackgroundImageError: (exception, stackTrace) {},
                 child: _currentHostPfp.isEmpty

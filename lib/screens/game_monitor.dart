@@ -66,8 +66,9 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
       final gameResponse = await AuthService().getGameDetails(widget.joinCode);
       final gameData = gameResponse.data;
 
-      final leaderboardResponse =
-          await AuthService().getLeaderboard(widget.joinCode);
+      final leaderboardResponse = await AuthService().getLeaderboard(
+        widget.joinCode,
+      );
       final leaderboardData = leaderboardResponse.data['leaderboard'] ?? [];
 
       if (mounted) {
@@ -468,252 +469,258 @@ class _GameMonitorScreenState extends State<GameMonitorScreen> {
         }
       },
       child: Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        centerTitle: true,
         backgroundColor: colorScheme.surface,
-        surfaceTintColor: colorScheme.surface,
-        elevation: 0,
-        title: Text(
-          'AMINGO',
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.8,
+        appBar: AppBar(
+          centerTitle: true,
+          backgroundColor: colorScheme.surface,
+          surfaceTintColor: colorScheme.surface,
+          elevation: 0,
+          title: Text(
+            'AMINGO',
+            style: textTheme.titleLarge?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.8,
+            ),
           ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.emoji_events_rounded,
+                color: colorScheme.primary,
+              ),
+              tooltip: "View Leaderboard",
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        LeaderboardScreen(joinCode: widget.joinCode),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(width: 8),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.emoji_events_rounded, color: colorScheme.primary),
-            tooltip: "View Leaderboard",
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      LeaderboardScreen(joinCode: widget.joinCode),
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _heroHeader(context),
-                const SizedBox(height: 20),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surface,
-                    borderRadius: BorderRadius.circular(28),
-                    border: Border.all(
-                      color: colorScheme.outlineVariant.withValues(alpha: 0.7),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _heroHeader(context),
+                  const SizedBox(height: 20),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(28),
+                      border: Border.all(
+                        color: colorScheme.outlineVariant.withValues(
+                          alpha: 0.7,
+                        ),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'TIME LEFT',
-                            style: TextStyle(
-                              color: colorScheme.onSurfaceVariant,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.1,
-                            ),
-                          ),
-                          Text(
-                            '${(progress * 100).round()}%',
-                            style: TextStyle(
-                              color: colorScheme.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _timeChip(context, twoDigits(hours), 'HRS'),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 18),
-                            child: Text(
-                              ':',
-                              style: TextStyle(
-                                fontSize: 22,
-                                color: colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          _timeChip(context, twoDigits(minutes), 'MIN'),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 18),
-                            child: Text(
-                              ':',
-                              style: TextStyle(
-                                fontSize: 22,
-                                color: colorScheme.onSurfaceVariant,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                          _timeChip(context, twoDigits(seconds), 'SEC'),
-                        ],
-                      ),
-                      const SizedBox(height: 18),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(999),
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          minHeight: 10,
-                          backgroundColor: colorScheme.outlineVariant
-                              .withValues(alpha: 0.5),
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 18),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final cardWidth = (constraints.maxWidth - 24) / 3;
-                    return Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          width: cardWidth,
-                          child: _statCard(
-                            context: context,
-                            label: 'TILES DONE',
-                            value: '$tilesDone',
-                            helper: 'Marked successfully',
-                            icon: Icons.grid_view_rounded,
-                            accent: colorScheme.primary,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'TIME LEFT',
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.1,
+                              ),
+                            ),
+                            Text(
+                              '${(progress * 100).round()}%',
+                              style: TextStyle(
+                                color: colorScheme.primary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          width: cardWidth,
-                          child: _statCard(
-                            context: context,
-                            label: 'ACTIVE',
-                            value: '$activePlayers',
-                            helper: 'Players online right now',
-                            icon: Icons.people_alt_rounded,
-                            accent: Colors.teal,
-                          ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _timeChip(context, twoDigits(hours), 'HRS'),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 18),
+                              child: Text(
+                                ':',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                            _timeChip(context, twoDigits(minutes), 'MIN'),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 18),
+                              child: Text(
+                                ':',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  color: colorScheme.onSurfaceVariant,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                            _timeChip(context, twoDigits(seconds), 'SEC'),
+                          ],
                         ),
-                        SizedBox(
-                          width: cardWidth,
-                          child: _statCard(
-                            context: context,
-                            label: 'MAX CAP',
-                            value: maxCap,
-                            helper: 'Player limit',
-                            icon: Icons.how_to_reg_rounded,
-                            accent: Colors.deepOrange,
+                        const SizedBox(height: 18),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(999),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 10,
+                            backgroundColor: colorScheme.outlineVariant
+                                .withValues(alpha: 0.5),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              colorScheme.primary,
+                            ),
                           ),
                         ),
                       ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 22),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _sectionTitle(
-                      context,
-                      'Live Leaderboard',
-                      'Current player rankings',
                     ),
-                    if (topPlayers.isNotEmpty)
-                      Text(
-                        '${topPlayers.length} PLAYERS',
-                        style: TextStyle(
-                          color: colorScheme.primary,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                if (isLoadingLeaderboard)
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(20.0),
-                      child: CircularProgressIndicator(),
-                    ),
-                  )
-                else if (topPlayers.isEmpty)
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(32),
-                      decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerLow,
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: Column(
+                  ),
+                  const SizedBox(height: 18),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final cardWidth = (constraints.maxWidth - 24) / 3;
+                      return Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
                         children: [
-                          Icon(
-                            Icons.group_off_rounded,
-                            size: 48,
-                            color: colorScheme.outline,
+                          SizedBox(
+                            width: cardWidth,
+                            child: _statCard(
+                              context: context,
+                              label: 'TILES DONE',
+                              value: '$tilesDone',
+                              helper: 'Marked successfully',
+                              icon: Icons.grid_view_rounded,
+                              accent: colorScheme.primary,
+                            ),
                           ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'No players joined yet',
-                            style: TextStyle(
-                              color: colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w600,
+                          SizedBox(
+                            width: cardWidth,
+                            child: _statCard(
+                              context: context,
+                              label: 'ACTIVE',
+                              value: '$activePlayers',
+                              helper: 'Players online right now',
+                              icon: Icons.people_alt_rounded,
+                              accent: Colors.teal,
+                            ),
+                          ),
+                          SizedBox(
+                            width: cardWidth,
+                            child: _statCard(
+                              context: context,
+                              label: 'MAX CAP',
+                              value: maxCap,
+                              helper: 'Player limit',
+                              icon: Icons.how_to_reg_rounded,
+                              accent: Colors.deepOrange,
                             ),
                           ),
                         ],
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 22),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _sectionTitle(
+                        context,
+                        'Live Leaderboard',
+                        'Current player rankings',
                       ),
-                    ),
-                  )
-                else
-                  ...topPlayers.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final player = entry.value;
-                    return _rankingCard(
-                      context: context,
-                      rank: index + 1,
-                      name: player['name'] ?? 'Unknown',
-                      points: player['points'] ?? 0,
-                    );
-                  }),
-                const SizedBox(height: 20),
-              ],
+                      if (topPlayers.isNotEmpty)
+                        Text(
+                          '${topPlayers.length} PLAYERS',
+                          style: TextStyle(
+                            color: colorScheme.primary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  if (isLoadingLeaderboard)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  else if (topPlayers.isEmpty)
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(32),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.group_off_rounded,
+                              size: 48,
+                              color: colorScheme.outline,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'No players joined yet',
+                              style: TextStyle(
+                                color: colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    ...topPlayers.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final player = entry.value;
+                      return _rankingCard(
+                        context: context,
+                        rank: index + 1,
+                        name: player['name'] ?? 'Unknown',
+                        points: player['points'] ?? 0,
+                      );
+                    }),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),
       ),
-    ));
+    );
   }
 }

@@ -136,7 +136,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         backgroundColor: colorScheme.primary.withValues(
                           alpha: 0.1,
                         ),
-                        backgroundImage: profileImageUrl != null && profileImageUrl!.isNotEmpty
+                        backgroundImage:
+                            profileImageUrl != null &&
+                                profileImageUrl!.isNotEmpty
                             ? NetworkImage(
                                 profileImageUrl!.startsWith('http')
                                     ? profileImageUrl!

@@ -196,4 +196,3 @@ class RoleCard extends StatelessWidget {
     );
   }
 }
-

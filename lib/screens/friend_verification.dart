@@ -342,7 +342,9 @@ class _FriendVerificationState extends State<FriendVerification> {
               decoration: BoxDecoration(
                 color: colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: colorScheme.primary.withValues(alpha: 0.2)),
+                border: Border.all(
+                  color: colorScheme.primary.withValues(alpha: 0.2),
+                ),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

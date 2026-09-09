@@ -67,13 +67,6 @@ class _BingoBoardState extends State<BingoBoard> {
     });
   }
 
-  void _showTimeUp() {
-    if (mounted) {
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(const SnackBar(content: Text("Time's up!")));
-    }
-  }
 
   Future<void> _fetchBoard() async {
     try {
@@ -204,53 +197,56 @@ class _BingoBoardState extends State<BingoBoard> {
       },
       child: Scaffold(
         backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: colorScheme.surface,
-        centerTitle: true,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/images/amMingo.png', height: 40),
-            const SizedBox(width: 8),
-            Text(
-              "Amingo",
-              style: textTheme.titleLarge?.copyWith(
-                color: colorScheme.onSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          _buildScoreBadge(colorScheme),
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
+        appBar: AppBar(
+          backgroundColor: colorScheme.surface,
+          centerTitle: true,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              _buildHeader(textTheme, colorScheme),
-              const SizedBox(height: 24),
-              _buildBingoBoard(colorScheme, textTheme, size),
-              const SizedBox(height: 24),
-              _buildStats(colorScheme, textTheme, size),
+              Image.asset('assets/images/amMingo.png', height: 40),
+              const SizedBox(width: 8),
+              Text(
+                "Amingo",
+                style: textTheme.titleLarge?.copyWith(
+                  color: colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
+          actions: [
+            _buildScoreBadge(colorScheme),
+            IconButton(
+              icon: const Icon(Icons.person),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(width: 8),
+          ],
         ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              children: [
+                _buildHeader(textTheme, colorScheme),
+                const SizedBox(height: 24),
+                _buildBingoBoard(colorScheme, textTheme, size),
+                const SizedBox(height: 24),
+                _buildStats(colorScheme, textTheme, size),
+              ],
+            ),
+          ),
+        ),
+        bottomNavigationBar: _buildBottomNav(colorScheme, textTheme),
       ),
-      bottomNavigationBar: _buildBottomNav(colorScheme, textTheme),
-    ));
+    );
   }
 
   Widget _buildScoreBadge(ColorScheme cs) {
