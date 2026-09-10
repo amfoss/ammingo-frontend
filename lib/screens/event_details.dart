@@ -135,6 +135,34 @@ class _EventDetailsState extends State<EventDetails> {
     }
   }
 
+  void _showErrorDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.error_outline_rounded, color: Colors.orange, size: 28),
+            const SizedBox(width: 12),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          ],
+        ),
+        content: Text(message, style: const TextStyle(fontSize: 15, height: 1.4)),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK", style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -499,13 +527,10 @@ class _EventDetailsState extends State<EventDetails> {
 
               if (!_availableBoardSizes.contains(gridIntSize)) {
                 String allowedStr = _availableBoardSizes.join(', ');
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      "Board size ${gridIntSize}x$gridIntSize is not allowed. "
-                      "Based on participants, allowed sizes are: $allowedStr",
-                    ),
-                  ),
+                _showErrorDialog(
+                  "Invalid Grid Size",
+                  "Board size ${gridIntSize}x$gridIntSize is not allowed. "
+                  "Based on current participants, allowed sizes are: $allowedStr",
                 );
                 return;
               }
@@ -529,13 +554,15 @@ class _EventDetailsState extends State<EventDetails> {
             } catch (e) {
               String errorMsg = "Failed to start game: $e";
               if (e is DioException && e.response?.data is Map) {
-                final detail = e.response!.data['detail'];
-                if (detail != null) errorMsg = detail.toString();
+                final data = e.response!.data as Map;
+                if (data.containsKey('detail')) {
+                  errorMsg = data['detail'].toString();
+                } else if (data.containsKey('error')) {
+                  errorMsg = data['error'].toString();
+                }
               }
               if (context.mounted) {
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text(errorMsg)));
+                _showErrorDialog("Cannot Start Game", errorMsg);
               }
             }
           }
