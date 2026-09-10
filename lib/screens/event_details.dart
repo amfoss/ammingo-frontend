@@ -142,21 +142,36 @@ class _EventDetailsState extends State<EventDetails> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            const Icon(Icons.error_outline_rounded, color: Colors.orange, size: 28),
+            const Icon(
+              Icons.error_outline_rounded,
+              color: Colors.orange,
+              size: 28,
+            ),
             const SizedBox(width: 12),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
           ],
         ),
-        content: Text(message, style: const TextStyle(fontSize: 15, height: 1.4)),
+        content: Text(
+          message,
+          style: const TextStyle(fontSize: 15, height: 1.4),
+        ),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             onPressed: () => Navigator.pop(context),
-            child: const Text("OK", style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text(
+              "OK",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -530,7 +545,7 @@ class _EventDetailsState extends State<EventDetails> {
                 _showErrorDialog(
                   "Invalid Grid Size",
                   "Board size ${gridIntSize}x$gridIntSize is not allowed. "
-                  "Based on current participants, allowed sizes are: $allowedStr",
+                      "Based on current participants, allowed sizes are: $allowedStr",
                 );
                 return;
               }
