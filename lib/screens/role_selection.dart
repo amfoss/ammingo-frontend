@@ -144,53 +144,76 @@ class RoleCard extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     final height = MediaQuery.of(context).size.height;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: width * 0.9,
-        height: height * 0.2,
-        padding: const EdgeInsets.all(20),
-
-        decoration: BoxDecoration(
-          border: Border(
-            left: BorderSide(color: colorScheme.primary, width: width * 0.013),
-          ),
-          color: colorScheme.surfaceContainer,
-          borderRadius: BorderRadius.circular(20),
+    return Container(
+      width: width * 0.9,
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.6),
         ),
-
-        child: Row(
-          children: [
-            Icon(icon, color: colorScheme.primary, size: 40),
-
-            SizedBox(width: width * 0.04),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.all(22),
+              child: Row(
                 children: [
-                  Text(
-                    title,
-                    style: textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: colorScheme.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(icon, color: colorScheme.primary, size: 28),
+                  ),
+                  SizedBox(width: width * 0.04),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          title,
+                          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          description,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-
-                  SizedBox(height: height * 0.01),
-
-                  Text(
-                    description,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                  const SizedBox(width: 8),
+                  Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 16,
+                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                   ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
