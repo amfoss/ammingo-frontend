@@ -75,9 +75,7 @@ class _EmailInputState extends State<HomeScreen> {
 
     if (!validateEmail(email)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please enter a valid email address."),
-        ),
+        const SnackBar(content: Text("Please enter a valid email address.")),
       );
       return;
     }
@@ -89,17 +87,15 @@ class _EmailInputState extends State<HomeScreen> {
       if (!mounted) return;
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => LoginScreen(email: email),
-        ),
+        MaterialPageRoute(builder: (context) => LoginScreen(email: email)),
       );
     } catch (e) {
       debugPrint(e.toString());
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       if (mounted) {
         setState(() => isLoading = false);

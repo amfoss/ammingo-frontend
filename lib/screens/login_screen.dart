@@ -278,14 +278,21 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: OutlinedButton.icon(
                   onPressed: countdown == 0 && !isResending ? resendOtp : null,
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: countdown == 0 ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                    foregroundColor: countdown == 0
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
                     side: BorderSide(
-                      color: countdown == 0 ? colorScheme.primary : colorScheme.outline.withValues(alpha: 0.5),
+                      color: countdown == 0
+                          ? colorScheme.primary
+                          : colorScheme.outline.withValues(alpha: 0.5),
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                   ),
                   icon: isResending
                       ? const SizedBox(
@@ -295,7 +302,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         )
                       : const Icon(Icons.refresh_rounded, size: 18),
                   label: Text(
-                    countdown > 0 ? "Resend OTP in ${countdown}s" : "Resend OTP",
+                    countdown > 0
+                        ? "Resend OTP in ${countdown}s"
+                        : "Resend OTP",
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
