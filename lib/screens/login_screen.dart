@@ -209,8 +209,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
               TextField(
                 controller: otpController,
+                autofocus: true,
                 maxLength: 6,
                 keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => login(),
                 style: TextStyle(
                   color: colorScheme.onSurface,
                   letterSpacing: 4,
@@ -269,28 +272,33 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              SizedBox(height: height * 0.01),
+              SizedBox(height: height * 0.02),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: countdown == 0 && !isResending ? resendOtp : null,
-                    child: Text(
-                      "Resend OTP",
-                      style: TextStyle(
-                        color: countdown == 0
-                            ? colorScheme.primary
-                            : Colors.grey,
-                        fontWeight: FontWeight.bold,
-                      ),
+              Center(
+                child: OutlinedButton.icon(
+                  onPressed: countdown == 0 && !isResending ? resendOtp : null,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: countdown == 0 ? colorScheme.primary : colorScheme.onSurfaceVariant,
+                    side: BorderSide(
+                      color: countdown == 0 ? colorScheme.primary : colorScheme.outline.withValues(alpha: 0.5),
                     ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
-                  const SizedBox(width: 6),
-                  countdown > 0
-                      ? Text("in $countdown seconds")
-                      : const Text("now"),
-                ],
+                  icon: isResending
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.refresh_rounded, size: 18),
+                  label: Text(
+                    countdown > 0 ? "Resend OTP in ${countdown}s" : "Resend OTP",
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
               ),
 
               SizedBox(height: height * 0.04),

@@ -128,7 +128,10 @@ class _CreateUsernameState extends State<CreateUsername> {
 
                   TextField(
                     controller: nameController,
+                    autofocus: true,
                     keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (_) => _saveProfile(),
                     cursorColor: colorScheme.primary,
                     style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(

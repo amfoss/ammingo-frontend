@@ -62,11 +62,49 @@ class HomeScreen extends StatefulWidget {
 
 class _EmailInputState extends State<HomeScreen> {
   final TextEditingController _controller = TextEditingController();
+  bool isLoading = false;
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleGetOtp() async {
+    String email = _controller.text.trim();
+
+    if (!validateEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter a valid email address."),
+        ),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);
+    try {
+      await AuthService().sendOtp(email);
+
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(email: email),
+        ),
+      );
+    } catch (e) {
+      debugPrint(e.toString());
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
+    }
   }
 
   @override
@@ -146,6 +184,8 @@ class _EmailInputState extends State<HomeScreen> {
 
                   TextField(
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (_) => _handleGetOtp(),
                     style: TextStyle(color: colorScheme.onSurface),
                     controller: _controller,
                     cursorColor: colorScheme.primary,
@@ -179,38 +219,7 @@ class _EmailInputState extends State<HomeScreen> {
                     width: double.infinity,
                     height: height * 0.07,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        String email = _controller.text.trim();
-
-                        if (validateEmail(email)) {
-                          try {
-                            await AuthService().sendOtp(email);
-
-                            if (!context.mounted) return;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LoginScreen(email: email),
-                              ),
-                            );
-                          } catch (e) {
-                            debugPrint(e.toString());
-
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(e.toString())),
-                            );
-                          }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "Please enter a valid email address.",
-                              ),
-                            ),
-                          );
-                        }
-                      },
+                      onPressed: isLoading ? null : _handleGetOtp,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: colorScheme.primary,
                         foregroundColor: colorScheme.onPrimary,
@@ -219,13 +228,22 @@ class _EmailInputState extends State<HomeScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text(
-                        "Get OTP",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: width * 0.05,
-                        ),
-                      ),
+                      child: isLoading
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(
+                              "Get OTP",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: width * 0.05,
+                              ),
+                            ),
                     ),
                   ),
 

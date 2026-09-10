@@ -620,20 +620,25 @@ class DetailCard extends StatelessWidget {
 
     return Container(
       width: width * 0.9,
-      padding: const EdgeInsets.all(20),
-
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.6)),
       ),
-
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: colorScheme.primary, size: 36),
-
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: colorScheme.primary, size: 24),
+          ),
           SizedBox(width: width * 0.04),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -648,17 +653,14 @@ class DetailCard extends StatelessWidget {
                     color: colorScheme.onSurface,
                   ),
                 ),
-
-                const SizedBox(height: 6),
-
-                Flexible(
-                  child: Text(
-                    subDetail,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
+                const SizedBox(height: 4),
+                Text(
+                  subDetail,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.35,
                   ),
                 ),
               ],
